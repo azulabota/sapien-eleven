@@ -212,6 +212,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
+  const mouseRef = useRef<{ x: number; y: number; active: boolean }>({ x: -1000, y: -1000, active: false });
   const stateRef = useRef<{
     nodes: CanvasNode[];
     edges: CanvasEdge[];
@@ -302,8 +303,28 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       initCanvas();
     };
     window.addEventListener('resize', handleResize);
+
+    // Mouse interaction handlers
+    const canvas = canvasRef.current;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        active: true,
+      };
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -1000, y: -1000, active: false };
+    };
+    canvas?.addEventListener('mousemove', handleMouseMove);
+    canvas?.addEventListener('mouseleave', handleMouseLeave);
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      canvas?.removeEventListener('mousemove', handleMouseMove);
+      canvas?.removeEventListener('mouseleave', handleMouseLeave);
       cancelAnimationFrame(animRef.current);
     };
   }, [initCanvas]);
@@ -339,6 +360,9 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       ctx.clearRect(0, 0, W, H);
 
       /* --- Background particle field --- */
+      const mouse = mouseRef.current;
+      const mouseInfluenceRadius = 120;
+
       for (const dot of bgDots) {
         dot.x += dot.vx;
         dot.y += dot.vy;
@@ -347,32 +371,96 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         if (dot.y < 0) dot.y = H;
         if (dot.y > H) dot.y = 0;
 
+        // Mouse attraction for background dots
+        if (mouse.active) {
+          const dx = mouse.x - dot.x;
+          const dy = mouse.y - dot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius && dist > 1) {
+            const force = (1 - dist / mouseInfluenceRadius) * 0.15;
+            dot.x += dx / dist * force;
+            dot.y += dy / dist * force;
+          }
+        }
+
         dot.pulsePhase += 0.01;
         const pulse = 0.5 + 0.5 * Math.sin(dot.pulsePhase);
         const alpha = dot.opacity * (0.4 + 0.6 * pulse);
 
+        // Brighten near mouse
+        let dotBrightness = 1;
+        if (mouse.active) {
+          const dx = mouse.x - dot.x;
+          const dy = mouse.y - dot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius) {
+            dotBrightness = 1 + (1 - dist / mouseInfluenceRadius) * 2;
+          }
+        }
+
         ctx.beginPath();
-        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `${col}${alpha})`;
+        ctx.arc(dot.x, dot.y, dot.radius * (0.8 + dotBrightness * 0.2), 0, Math.PI * 2);
+        ctx.fillStyle = `${col}${Math.min(alpha * dotBrightness, 0.9)})`;
         ctx.fill();
       }
 
-      /* --- Update node positions (orbital drift) --- */
+      // Draw mouse glow if active
+      if (mouse.active) {
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouseInfluenceRadius);
+        mouseGlow.addColorStop(0, `${col}0.06)`);
+        mouseGlow.addColorStop(0.5, `${col}0.02)`);
+        mouseGlow.addColorStop(1, `${col}0)`);
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, mouseInfluenceRadius, 0, Math.PI * 2);
+        ctx.fillStyle = mouseGlow;
+        ctx.fill();
+      }
+
+      /* --- Update node positions (orbital drift + mouse interaction) --- */
       for (const node of nodes) {
         if (node.isHub) continue;
         node.orbitAngle += node.orbitSpeed * speedMult;
-        node.x = node.baseX + Math.cos(node.orbitAngle) * node.orbitRadius;
-        node.y = node.baseY + Math.sin(node.orbitAngle) * node.orbitRadius;
+        let targetX = node.baseX + Math.cos(node.orbitAngle) * node.orbitRadius;
+        let targetY = node.baseY + Math.sin(node.orbitAngle) * node.orbitRadius;
+
+        // Mouse: attract nodes toward cursor
+        if (mouse.active) {
+          const dx = mouse.x - targetX;
+          const dy = mouse.y - targetY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius && dist > 1) {
+            const force = (1 - dist / mouseInfluenceRadius) * 18;
+            targetX += dx / dist * force;
+            targetY += dy / dist * force;
+          }
+        }
+
+        // Smooth lerp toward target
+        node.x += (targetX - node.x) * 0.12;
+        node.y += (targetY - node.y) * 0.12;
       }
 
-      /* --- Draw edges --- */
+      /* --- Draw edges (brighter near mouse) --- */
       for (const edge of edges) {
         const nA = nodes[edge.from];
         const nB = nodes[edge.to];
         if (!nA || !nB) continue;
 
         const isHubEdge = nA.isHub || nB.isHub;
-        const lineAlpha = isHubEdge ? 0.15 : 0.08;
+        let lineAlpha = isHubEdge ? 0.15 : 0.08;
+
+        // Brighten edges near mouse
+        if (mouse.active) {
+          const midX = (nA.x + nB.x) / 2;
+          const midY = (nA.y + nB.y) / 2;
+          const dx = mouse.x - midX;
+          const dy = mouse.y - midY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius) {
+            const boost = (1 - dist / mouseInfluenceRadius) * 0.3;
+            lineAlpha += boost;
+          }
+        }
 
         ctx.beginPath();
         ctx.moveTo(nA.x, nA.y);
@@ -380,6 +468,24 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         ctx.strokeStyle = `${col}${lineAlpha})`;
         ctx.lineWidth = isHubEdge ? 0.8 : 0.5;
         ctx.stroke();
+      }
+
+      // Draw temporary connection lines from mouse to nearby nodes
+      if (mouse.active) {
+        for (const node of nodes) {
+          const dx = mouse.x - node.x;
+          const dy = mouse.y - node.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius * 0.8 && dist > 5) {
+            const alpha = (1 - dist / (mouseInfluenceRadius * 0.8)) * 0.2;
+            ctx.beginPath();
+            ctx.moveTo(mouse.x, mouse.y);
+            ctx.lineTo(node.x, node.y);
+            ctx.strokeStyle = `${col}${alpha})`;
+            ctx.lineWidth = 0.4;
+            ctx.stroke();
+          }
+        }
       }
 
       /* --- Draw data particles traveling along edges --- */
@@ -435,17 +541,28 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         node.pulsePhase += node.pulseSpeed * speedMult;
         const pulse = 0.5 + 0.5 * Math.sin(node.pulsePhase);
 
+        // Mouse proximity factor for this node
+        let mouseProximity = 0;
+        if (mouse.active) {
+          const dx = mouse.x - node.x;
+          const dy = mouse.y - node.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseInfluenceRadius) {
+            mouseProximity = 1 - dist / mouseInfluenceRadius;
+          }
+        }
+
         if (node.isHub) {
           // Hub node: large with prominent glow halo
           const hubPulse = 0.7 + 0.3 * Math.sin(t * 1.5);
-          const hubRadius = node.radius * hubPulse;
+          const hubRadius = node.radius * hubPulse * (1 + mouseProximity * 0.3);
 
-          // Outer halo glow
-          const haloR = hubRadius * 5;
+          // Outer halo glow (bigger when mouse near)
+          const haloR = hubRadius * (5 + mouseProximity * 3);
           const haloGrad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, haloR);
-          haloGrad.addColorStop(0, `${col}0.18)`);
-          haloGrad.addColorStop(0.3, `${col}0.08)`);
-          haloGrad.addColorStop(0.6, `${col}0.03)`);
+          haloGrad.addColorStop(0, `${col}${0.18 + mouseProximity * 0.2})`);
+          haloGrad.addColorStop(0.3, `${col}${0.08 + mouseProximity * 0.08})`);
+          haloGrad.addColorStop(0.6, `${col}${0.03 + mouseProximity * 0.03})`);
           haloGrad.addColorStop(1, `${col}0)`);
           ctx.beginPath();
           ctx.arc(node.x, node.y, haloR, 0, Math.PI * 2);
@@ -486,12 +603,12 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           ctx.lineWidth = 0.6;
           ctx.stroke();
         } else {
-          // Satellite nodes: pulsing glow
-          const nodeAlpha = 0.5 + 0.5 * pulse;
-          const r = node.radius * (0.85 + 0.15 * pulse);
+          // Satellite nodes: pulsing glow, enhanced near mouse
+          const nodeAlpha = 0.5 + 0.5 * pulse + mouseProximity * 0.4;
+          const r = node.radius * (0.85 + 0.15 * pulse) * (1 + mouseProximity * 0.5);
 
-          // Glow
-          const glowR = r * 3.5;
+          // Glow (larger and brighter near mouse)
+          const glowR = r * (3.5 + mouseProximity * 3);
           const glowGrad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowR);
           glowGrad.addColorStop(0, `${col}${nodeAlpha * 0.2})`);
           glowGrad.addColorStop(0.5, `${col}${nodeAlpha * 0.06})`);
@@ -534,7 +651,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
-        style={{ pointerEvents: 'none' }}
+        style={{ cursor: 'none' }}
       />
     </div>
   );
