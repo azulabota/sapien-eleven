@@ -283,6 +283,11 @@
   50% { box-shadow: 0 0 40px rgba(202, 60, 61, 0.5), 0 0 80px rgba(202, 60, 61, 0.15); }
 }
 
+@keyframes logo-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1.8); }
+  50% { opacity: 1; transform: scale(2.2); }
+}
+
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

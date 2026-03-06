@@ -28,12 +28,26 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <img
-              src="/s-logo.png"
-              alt="Sapien Eleven"
-              className="w-9 h-9 object-contain"
-              style={{ filter: 'drop-shadow(0 0 6px rgba(202,60,61,0.5))' }}
-            />
+            <div className="relative w-9 h-9 flex items-center justify-center">
+              {/* Animated pulsing red glow behind logo */}
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, rgba(202,60,61,0.35) 0%, rgba(202,60,61,0) 70%)',
+                  animation: 'logo-glow-pulse 2.5s ease-in-out infinite',
+                  transform: 'scale(1.8)',
+                }}
+              />
+              <img
+                src="/s-logo.png"
+                alt="Sapien Eleven"
+                className="w-9 h-9 object-contain relative"
+                style={{
+                  mixBlendMode: 'lighten',
+                  filter: 'drop-shadow(0 0 8px rgba(202,60,61,0.6)) brightness(1.15)',
+                }}
+              />
+            </div>
             <div>
               <span
                 className="font-display text-sm font-700 tracking-widest"
