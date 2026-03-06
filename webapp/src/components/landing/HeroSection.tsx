@@ -289,6 +289,208 @@ function DataSphereAnimation() {
         }
       }
 
+      // ========================================
+      // Floating "S" Icon (drawn on canvas)
+      // ========================================
+      const floatY = Math.sin(time * 1.2) * 6; // gentle vertical float
+      const iconScale = 0.58;
+      const iconW = 140 * iconScale;
+      const iconH = 160 * iconScale;
+      const ix = cx - iconW / 2;
+      const iy = cy - iconH / 2 + floatY;
+
+      ctx.save();
+      ctx.translate(ix, iy);
+      ctx.scale(iconScale, iconScale);
+
+      // Red glow behind the icon
+      const glowPulse = 0.4 + Math.sin(time * 1.5) * 0.15;
+      const iconGlow = ctx.createRadialGradient(70, 80, 20, 70, 80, 120);
+      iconGlow.addColorStop(0, `rgba(202,60,61,${glowPulse * 0.3})`);
+      iconGlow.addColorStop(0.5, `rgba(202,60,61,${glowPulse * 0.1})`);
+      iconGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = iconGlow;
+      ctx.beginPath();
+      ctx.arc(70, 80, 120, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Shadow layer (offset +3,+3)
+      ctx.save();
+      ctx.translate(3, 3);
+      // Top chevron shadow
+      ctx.beginPath();
+      ctx.moveTo(18, 11); ctx.lineTo(98, 11); ctx.lineTo(122, 43);
+      ctx.lineTo(98, 75); ctx.lineTo(18, 75); ctx.closePath();
+      const shadowGrad = ctx.createLinearGradient(0, 0, 140, 160);
+      shadowGrad.addColorStop(0, '#6B1010');
+      shadowGrad.addColorStop(1, '#3D0808');
+      ctx.fillStyle = shadowGrad;
+      ctx.fill();
+      // Bottom chevron shadow
+      ctx.beginPath();
+      ctx.moveTo(42, 85); ctx.lineTo(122, 85); ctx.lineTo(122, 149);
+      ctx.lineTo(42, 149); ctx.lineTo(18, 117); ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Top chevron: flat left, pointed right like ">"
+      const topBevel = ctx.createLinearGradient(0, 11, 0, 75);
+      topBevel.addColorStop(0, '#F5A0A0');
+      topBevel.addColorStop(0.3, '#E85555');
+      topBevel.addColorStop(1, '#B02020');
+      ctx.beginPath();
+      ctx.moveTo(18, 11); ctx.lineTo(98, 11); ctx.lineTo(122, 43);
+      ctx.lineTo(98, 75); ctx.lineTo(18, 75); ctx.closePath();
+      ctx.fillStyle = topBevel;
+      ctx.fill();
+
+      // Brushed metal overlay on top chevron
+      const brushed = ctx.createLinearGradient(0, 0, 140, 0);
+      brushed.addColorStop(0, 'rgba(255,255,255,0.08)');
+      brushed.addColorStop(0.25, 'rgba(255,255,255,0)');
+      brushed.addColorStop(0.5, 'rgba(255,255,255,0.06)');
+      brushed.addColorStop(0.75, 'rgba(255,255,255,0)');
+      brushed.addColorStop(1, 'rgba(255,255,255,0.04)');
+      ctx.beginPath();
+      ctx.moveTo(18, 11); ctx.lineTo(98, 11); ctx.lineTo(122, 43);
+      ctx.lineTo(98, 75); ctx.lineTo(18, 75); ctx.closePath();
+      ctx.fillStyle = brushed;
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Bottom chevron: flat right, pointed left like "<"
+      const bottomBevel = ctx.createLinearGradient(0, 85, 0, 149);
+      bottomBevel.addColorStop(0, '#C03030');
+      bottomBevel.addColorStop(0.7, '#A82828');
+      bottomBevel.addColorStop(1, '#8B1A1A');
+      ctx.beginPath();
+      ctx.moveTo(42, 85); ctx.lineTo(122, 85); ctx.lineTo(122, 149);
+      ctx.lineTo(42, 149); ctx.lineTo(18, 117); ctx.closePath();
+      ctx.fillStyle = bottomBevel;
+      ctx.fill();
+
+      // Brushed metal overlay on bottom chevron
+      ctx.beginPath();
+      ctx.moveTo(42, 85); ctx.lineTo(122, 85); ctx.lineTo(122, 149);
+      ctx.lineTo(42, 149); ctx.lineTo(18, 117); ctx.closePath();
+      ctx.fillStyle = brushed;
+      ctx.globalAlpha = 0.7;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Top chevron highlight edges
+      ctx.beginPath();
+      ctx.moveTo(18, 11); ctx.lineTo(98, 11); ctx.lineTo(122, 43);
+      ctx.strokeStyle = '#F5A0A0';
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.6;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Top chevron left edge highlight
+      ctx.beginPath();
+      ctx.moveTo(18, 11); ctx.lineTo(18, 75);
+      ctx.strokeStyle = '#F5A0A0';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Bottom chevron bottom edge
+      ctx.beginPath();
+      ctx.moveTo(18, 117); ctx.lineTo(42, 149); ctx.lineTo(122, 149);
+      ctx.strokeStyle = '#8B1A1A';
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Bottom chevron right edge highlight
+      ctx.beginPath();
+      ctx.moveTo(122, 85); ctx.lineTo(122, 149);
+      ctx.strokeStyle = '#F07070';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.3;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Three vertical bars connecting the halves
+      const barGrad = ctx.createLinearGradient(0, 70, 0, 92);
+      barGrad.addColorStop(0, '#D04545');
+      barGrad.addColorStop(0.5, '#B02828');
+      barGrad.addColorStop(1, '#8B1A1A');
+
+      const barPositions = [36, 54, 72];
+      for (const bx of barPositions) {
+        // Bar fill
+        ctx.beginPath();
+        ctx.roundRect(bx, 70, 8, 22, 1.5);
+        ctx.fillStyle = barGrad;
+        ctx.fill();
+        // Bar brushed metal
+        ctx.beginPath();
+        ctx.roundRect(bx, 70, 8, 22, 1.5);
+        ctx.fillStyle = brushed;
+        ctx.globalAlpha = 0.5;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        // Bar left highlight
+        ctx.beginPath();
+        ctx.roundRect(bx, 70, 2, 22, 1);
+        ctx.fillStyle = '#F5A0A0';
+        ctx.globalAlpha = 0.25;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      // Inner bevel shadows
+      ctx.beginPath();
+      ctx.moveTo(18, 75); ctx.lineTo(98, 75); ctx.lineTo(122, 43);
+      ctx.strokeStyle = '#5A0E0E';
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(42, 85); ctx.lineTo(122, 85);
+      ctx.strokeStyle = '#F07070';
+      ctx.lineWidth = 0.8;
+      ctx.globalAlpha = 0.35;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(42, 85); ctx.lineTo(18, 117);
+      ctx.strokeStyle = '#5A0E0E';
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.3;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Specular highlights on chevron points
+      ctx.beginPath();
+      ctx.moveTo(108, 30); ctx.lineTo(122, 43); ctx.lineTo(108, 56); ctx.lineTo(115, 43);
+      ctx.closePath();
+      ctx.fillStyle = '#F5A0A0';
+      ctx.globalAlpha = 0.15;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(32, 104); ctx.lineTo(18, 117); ctx.lineTo(32, 130); ctx.lineTo(25, 117);
+      ctx.closePath();
+      ctx.fillStyle = '#F5A0A0';
+      ctx.globalAlpha = 0.12;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+      // ========================================
+      // End "S" Icon
+      // ========================================
+
       // Outer ring stroke (subtle)
       ctx.beginPath();
       ctx.arc(cx, cy, sphereRadius * 1.08, 0, Math.PI * 2);
