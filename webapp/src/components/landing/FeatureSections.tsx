@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 interface FeatureDef {
   id: string;
@@ -6,11 +10,51 @@ interface FeatureDef {
   headline: string;
   subline: string;
   bullets: string[];
-  nodeColor: string;
+  nodeColor: string;        // rgba prefix without closing alpha, e.g. "rgba(202,60,61,"
   accentColor: string;
-  nodePositions: Array<{ x: number; y: number; r: number; delay: number }>;
-  edges: Array<{ x1: number; y1: number; x2: number; y2: number }>;
+  theme: 'red' | 'silver';
+  speed: number;             // animation speed multiplier (1 = normal)
 }
+
+interface CanvasNode {
+  baseX: number;
+  baseY: number;
+  x: number;
+  y: number;
+  radius: number;
+  isHub: boolean;
+  pulsePhase: number;
+  pulseSpeed: number;
+  orbitAngle: number;
+  orbitRadius: number;
+  orbitSpeed: number;
+}
+
+interface CanvasEdge {
+  from: number;
+  to: number;
+}
+
+interface DataParticle {
+  edgeIdx: number;
+  progress: number;
+  speed: number;
+  forward: boolean;
+}
+
+interface BackgroundDot {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  pulsePhase: number;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Feature definitions (text content identical to original)           */
+/* ------------------------------------------------------------------ */
 
 const features: FeatureDef[] = [
   {
@@ -26,19 +70,8 @@ const features: FeatureDef[] = [
     ],
     nodeColor: 'rgba(202,60,61,',
     accentColor: 'rgba(202,60,61,0.9)',
-    nodePositions: [
-      { x: 60, y: 60, r: 8, delay: 0 },
-      { x: 120, y: 30, r: 5, delay: 0.3 },
-      { x: 40, y: 120, r: 4, delay: 0.6 },
-      { x: 140, y: 90, r: 6, delay: 0.9 },
-      { x: 90, y: 150, r: 5, delay: 1.2 },
-    ],
-    edges: [
-      { x1: 60, y1: 60, x2: 120, y2: 30 },
-      { x1: 60, y1: 60, x2: 40, y2: 120 },
-      { x1: 60, y1: 60, x2: 140, y2: 90 },
-      { x1: 60, y1: 60, x2: 90, y2: 150 },
-    ],
+    theme: 'red',
+    speed: 1.3,
   },
   {
     id: 'nutrition',
@@ -53,21 +86,8 @@ const features: FeatureDef[] = [
     ],
     nodeColor: 'rgba(190,190,190,',
     accentColor: 'rgba(200,200,200,0.85)',
-    nodePositions: [
-      { x: 80, y: 80, r: 8, delay: 0 },
-      { x: 30, y: 50, r: 4, delay: 0.2 },
-      { x: 140, y: 50, r: 5, delay: 0.4 },
-      { x: 50, y: 140, r: 4, delay: 0.6 },
-      { x: 130, y: 130, r: 6, delay: 0.8 },
-      { x: 90, y: 30, r: 3, delay: 1.0 },
-    ],
-    edges: [
-      { x1: 80, y1: 80, x2: 30, y2: 50 },
-      { x1: 80, y1: 80, x2: 140, y2: 50 },
-      { x1: 80, y1: 80, x2: 50, y2: 140 },
-      { x1: 80, y1: 80, x2: 130, y2: 130 },
-      { x1: 80, y1: 80, x2: 90, y2: 30 },
-    ],
+    theme: 'silver',
+    speed: 0.9,
   },
   {
     id: 'fitness',
@@ -82,19 +102,8 @@ const features: FeatureDef[] = [
     ],
     nodeColor: 'rgba(202,60,61,',
     accentColor: 'rgba(202,60,61,0.9)',
-    nodePositions: [
-      { x: 70, y: 70, r: 8, delay: 0 },
-      { x: 140, y: 60, r: 5, delay: 0.25 },
-      { x: 30, y: 130, r: 4, delay: 0.5 },
-      { x: 130, y: 140, r: 6, delay: 0.75 },
-      { x: 80, y: 160, r: 4, delay: 1.0 },
-    ],
-    edges: [
-      { x1: 70, y1: 70, x2: 140, y2: 60 },
-      { x1: 70, y1: 70, x2: 30, y2: 130 },
-      { x1: 70, y1: 70, x2: 130, y2: 140 },
-      { x1: 70, y1: 70, x2: 80, y2: 160 },
-    ],
+    theme: 'red',
+    speed: 1.5,
   },
   {
     id: 'mental-health',
@@ -109,102 +118,474 @@ const features: FeatureDef[] = [
     ],
     nodeColor: 'rgba(190,190,190,',
     accentColor: 'rgba(190,190,190,0.85)',
-    nodePositions: [
-      { x: 90, y: 80, r: 8, delay: 0 },
-      { x: 150, y: 50, r: 4, delay: 0.3 },
-      { x: 40, y: 60, r: 5, delay: 0.5 },
-      { x: 60, y: 150, r: 4, delay: 0.7 },
-      { x: 150, y: 140, r: 5, delay: 0.9 },
-      { x: 100, y: 170, r: 3, delay: 1.1 },
-    ],
-    edges: [
-      { x1: 90, y1: 80, x2: 150, y2: 50 },
-      { x1: 90, y1: 80, x2: 40, y2: 60 },
-      { x1: 90, y1: 80, x2: 60, y2: 150 },
-      { x1: 90, y1: 80, x2: 150, y2: 140 },
-      { x1: 90, y1: 80, x2: 100, y2: 170 },
-    ],
+    theme: 'silver',
+    speed: 0.6,
   },
 ];
 
-function FeatureNodeDiagram({ feature, visible }: { feature: FeatureDef; visible: boolean }) {
+/* ------------------------------------------------------------------ */
+/*  Helper: generate node layout for a feature                        */
+/* ------------------------------------------------------------------ */
+
+function generateNodeLayout(
+  W: number,
+  H: number,
+  nodeCount: number,
+  theme: 'red' | 'silver',
+): { nodes: CanvasNode[]; edges: CanvasEdge[] } {
+  const cx = W / 2;
+  const cy = H / 2;
+  const spread = Math.min(W, H) * 0.38;
+
+  const nodes: CanvasNode[] = [];
+
+  // Hub node in center
+  nodes.push({
+    baseX: cx,
+    baseY: cy,
+    x: cx,
+    y: cy,
+    radius: theme === 'red' ? 10 : 9,
+    isHub: true,
+    pulsePhase: 0,
+    pulseSpeed: 0.025,
+    orbitAngle: 0,
+    orbitRadius: 0,
+    orbitSpeed: 0,
+  });
+
+  // Satellite nodes arranged in rings
+  const ringCount = 2;
+  const nodesPerRing = [Math.floor((nodeCount - 1) * 0.45), Math.ceil((nodeCount - 1) * 0.55)];
+  const ringRadii = [spread * 0.45, spread * 0.85];
+
+  for (let ring = 0; ring < ringCount; ring++) {
+    const count = nodesPerRing[ring];
+    const baseRadius = ringRadii[ring];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + ring * 0.3;
+      const jitter = (Math.random() - 0.5) * spread * 0.15;
+      const r = baseRadius + jitter;
+      const bx = cx + Math.cos(angle) * r;
+      const by = cy + Math.sin(angle) * r;
+      nodes.push({
+        baseX: bx,
+        baseY: by,
+        x: bx,
+        y: by,
+        radius: 3 + Math.random() * 3,
+        isHub: false,
+        pulsePhase: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.015 + Math.random() * 0.02,
+        orbitAngle: Math.random() * Math.PI * 2,
+        orbitRadius: 2 + Math.random() * 4,
+        orbitSpeed: (0.003 + Math.random() * 0.006) * (Math.random() > 0.5 ? 1 : -1),
+      });
+    }
+  }
+
+  // Edges: hub connects to all, and nearby satellites connect to each other
+  const edges: CanvasEdge[] = [];
+  for (let i = 1; i < nodes.length; i++) {
+    edges.push({ from: 0, to: i });
+  }
+  // Interconnect nearby satellites
+  for (let i = 1; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].baseX - nodes[j].baseX;
+      const dy = nodes[i].baseY - nodes[j].baseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < spread * 0.55) {
+        edges.push({ from: i, to: j });
+      }
+    }
+  }
+
+  return { nodes, edges };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Canvas-based animated diagram component                            */
+/* ------------------------------------------------------------------ */
+
+function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isVisible: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<number>(0);
+  const stateRef = useRef<{
+    nodes: CanvasNode[];
+    edges: CanvasEdge[];
+    particles: DataParticle[];
+    bgDots: BackgroundDot[];
+    time: number;
+    initialized: boolean;
+    canvasW: number;
+    canvasH: number;
+  }>({
+    nodes: [],
+    edges: [],
+    particles: [],
+    bgDots: [],
+    time: 0,
+    initialized: false,
+    canvasW: 0,
+    canvasH: 0,
+  });
+
+  const initCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const W = rect.width;
+    const H = rect.height;
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = `${W}px`;
+    canvas.style.height = `${H}px`;
+
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.scale(dpr, dpr);
+
+    const nodeCount = 10;
+    const { nodes, edges } = generateNodeLayout(W, H, nodeCount, feature.theme);
+
+    // Create data particles
+    const particles: DataParticle[] = [];
+    const particleCount = Math.min(edges.length, 18);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        edgeIdx: Math.floor(Math.random() * edges.length),
+        progress: Math.random(),
+        speed: (0.003 + Math.random() * 0.006) * feature.speed,
+        forward: Math.random() > 0.5,
+      });
+    }
+
+    // Create background dots
+    const bgDots: BackgroundDot[] = [];
+    const dotCount = 30;
+    for (let i = 0; i < dotCount; i++) {
+      const speedMult = feature.theme === 'silver'
+        ? (feature.id === 'mental-health' ? 0.08 : 0.15)
+        : (feature.id === 'fitness' ? 0.25 : 0.2);
+      bgDots.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * speedMult,
+        vy: (Math.random() - 0.5) * speedMult,
+        radius: 0.5 + Math.random() * 1,
+        opacity: 0.1 + Math.random() * 0.2,
+        pulsePhase: Math.random() * Math.PI * 2,
+      });
+    }
+
+    stateRef.current = {
+      nodes,
+      edges,
+      particles,
+      bgDots,
+      time: 0,
+      initialized: true,
+      canvasW: W,
+      canvasH: H,
+    };
+  }, [feature]);
+
+  useEffect(() => {
+    initCanvas();
+
+    const handleResize = () => {
+      initCanvas();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animRef.current);
+    };
+  }, [initCanvas]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      cancelAnimationFrame(animRef.current);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const col = feature.nodeColor;
+    const isRed = feature.theme === 'red';
+    const speedMult = feature.speed;
+
+    const draw = () => {
+      const st = stateRef.current;
+      if (!st.initialized) {
+        animRef.current = requestAnimationFrame(draw);
+        return;
+      }
+
+      const { nodes, edges, particles, bgDots, canvasW: W, canvasH: H } = st;
+      st.time += 0.016 * speedMult;
+      const t = st.time;
+
+      const dpr = window.devicePixelRatio || 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+
+      /* --- Background particle field --- */
+      for (const dot of bgDots) {
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+        if (dot.x < 0) dot.x = W;
+        if (dot.x > W) dot.x = 0;
+        if (dot.y < 0) dot.y = H;
+        if (dot.y > H) dot.y = 0;
+
+        dot.pulsePhase += 0.01;
+        const pulse = 0.5 + 0.5 * Math.sin(dot.pulsePhase);
+        const alpha = dot.opacity * (0.4 + 0.6 * pulse);
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `${col}${alpha})`;
+        ctx.fill();
+      }
+
+      /* --- Update node positions (orbital drift) --- */
+      for (const node of nodes) {
+        if (node.isHub) continue;
+        node.orbitAngle += node.orbitSpeed * speedMult;
+        node.x = node.baseX + Math.cos(node.orbitAngle) * node.orbitRadius;
+        node.y = node.baseY + Math.sin(node.orbitAngle) * node.orbitRadius;
+      }
+
+      /* --- Draw edges --- */
+      for (const edge of edges) {
+        const nA = nodes[edge.from];
+        const nB = nodes[edge.to];
+        if (!nA || !nB) continue;
+
+        const isHubEdge = nA.isHub || nB.isHub;
+        const lineAlpha = isHubEdge ? 0.15 : 0.08;
+
+        ctx.beginPath();
+        ctx.moveTo(nA.x, nA.y);
+        ctx.lineTo(nB.x, nB.y);
+        ctx.strokeStyle = `${col}${lineAlpha})`;
+        ctx.lineWidth = isHubEdge ? 0.8 : 0.5;
+        ctx.stroke();
+      }
+
+      /* --- Draw data particles traveling along edges --- */
+      for (const particle of particles) {
+        const edge = edges[particle.edgeIdx];
+        if (!edge) continue;
+        const nA = nodes[edge.from];
+        const nB = nodes[edge.to];
+        if (!nA || !nB) continue;
+
+        particle.progress += particle.speed;
+        if (particle.progress >= 1) {
+          particle.progress = 0;
+          particle.edgeIdx = Math.floor(Math.random() * edges.length);
+          particle.forward = Math.random() > 0.5;
+        }
+
+        const prog = particle.forward ? particle.progress : 1 - particle.progress;
+        const px = nA.x + (nB.x - nA.x) * prog;
+        const py = nA.y + (nB.y - nA.y) * prog;
+        const packetAlpha = Math.sin(particle.progress * Math.PI) * 0.85;
+
+        // Glow
+        const glowR = isRed ? 8 : 6;
+        const grad = ctx.createRadialGradient(px, py, 0, px, py, glowR);
+        grad.addColorStop(0, `${col}${packetAlpha * 0.5})`);
+        grad.addColorStop(1, `${col}0)`);
+        ctx.beginPath();
+        ctx.arc(px, py, glowR, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `${col}${packetAlpha})`;
+        ctx.fill();
+
+        // Trail
+        const trailProg = Math.max(0, prog - 0.06);
+        const tx = nA.x + (nB.x - nA.x) * trailProg;
+        const ty = nA.y + (nB.y - nA.y) * trailProg;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(px, py);
+        ctx.strokeStyle = `${col}${packetAlpha * 0.35})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+
+      /* --- Draw nodes --- */
+      for (const node of nodes) {
+        node.pulsePhase += node.pulseSpeed * speedMult;
+        const pulse = 0.5 + 0.5 * Math.sin(node.pulsePhase);
+
+        if (node.isHub) {
+          // Hub node: large with prominent glow halo
+          const hubPulse = 0.7 + 0.3 * Math.sin(t * 1.5);
+          const hubRadius = node.radius * hubPulse;
+
+          // Outer halo glow
+          const haloR = hubRadius * 5;
+          const haloGrad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, haloR);
+          haloGrad.addColorStop(0, `${col}0.18)`);
+          haloGrad.addColorStop(0.3, `${col}0.08)`);
+          haloGrad.addColorStop(0.6, `${col}0.03)`);
+          haloGrad.addColorStop(1, `${col}0)`);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, haloR, 0, Math.PI * 2);
+          ctx.fillStyle = haloGrad;
+          ctx.fill();
+
+          // Inner glow ring
+          const innerHaloR = hubRadius * 2.5;
+          const innerGrad = ctx.createRadialGradient(node.x, node.y, hubRadius * 0.5, node.x, node.y, innerHaloR);
+          innerGrad.addColorStop(0, `${col}0.25)`);
+          innerGrad.addColorStop(0.5, `${col}0.1)`);
+          innerGrad.addColorStop(1, `${col}0)`);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, innerHaloR, 0, Math.PI * 2);
+          ctx.fillStyle = innerGrad;
+          ctx.fill();
+
+          // Core body
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, hubRadius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(10,10,10,0.9)';
+          ctx.fill();
+          ctx.strokeStyle = `${col}0.7)`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Bright inner dot
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, hubRadius * 0.45, 0, Math.PI * 2);
+          ctx.fillStyle = `${col}0.9)`;
+          ctx.fill();
+
+          // Pulsing ring
+          const ringR = hubRadius * (1.6 + pulse * 0.6);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, ringR, 0, Math.PI * 2);
+          ctx.strokeStyle = `${col}${0.1 + pulse * 0.12})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        } else {
+          // Satellite nodes: pulsing glow
+          const nodeAlpha = 0.5 + 0.5 * pulse;
+          const r = node.radius * (0.85 + 0.15 * pulse);
+
+          // Glow
+          const glowR = r * 3.5;
+          const glowGrad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowR);
+          glowGrad.addColorStop(0, `${col}${nodeAlpha * 0.2})`);
+          glowGrad.addColorStop(0.5, `${col}${nodeAlpha * 0.06})`);
+          glowGrad.addColorStop(1, `${col}0)`);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, glowR, 0, Math.PI * 2);
+          ctx.fillStyle = glowGrad;
+          ctx.fill();
+
+          // Body
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(10,10,10,0.85)';
+          ctx.fill();
+          ctx.strokeStyle = `${col}${nodeAlpha * 0.6})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+
+          // Inner highlight
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, r * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = `${col}${nodeAlpha * 0.8})`;
+          ctx.fill();
+        }
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [isVisible, feature]);
+
   return (
-    <div className="relative w-full" style={{ height: 200 }}>
-      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-        {/* Edges */}
-        {feature.edges.map((e, i) => (
-          <line
-            key={i}
-            x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
-            stroke={`${feature.nodeColor}0.2)`}
-            strokeWidth="0.8"
-            style={{
-              strokeDasharray: '200',
-              strokeDashoffset: visible ? '0' : '200',
-              transition: `stroke-dashoffset 0.8s ease ${i * 0.1}s`,
-            }}
-          />
-        ))}
-        {/* Nodes */}
-        {feature.nodePositions.map((n, i) => (
-          <g key={i}>
-            <circle
-              cx={n.x} cy={n.y} r={n.r * 2}
-              fill={`${feature.nodeColor}0.08)`}
-              style={{
-                opacity: visible ? 1 : 0,
-                transition: `opacity 0.4s ease ${n.delay}s`,
-              }}
-            />
-            <circle
-              cx={n.x} cy={n.y} r={n.r}
-              fill="rgba(10,10,10,0.85)"
-              stroke={`${feature.nodeColor}0.7)`}
-              strokeWidth="1"
-              style={{
-                opacity: visible ? 1 : 0,
-                transition: `opacity 0.4s ease ${n.delay}s`,
-                filter: `drop-shadow(0 0 4px ${feature.nodeColor}0.6))`,
-              }}
-            />
-            <circle
-              cx={n.x} cy={n.y} r={n.r * 0.4}
-              fill={`${feature.nodeColor}0.9)`}
-              style={{
-                opacity: visible ? 1 : 0,
-                transition: `opacity 0.4s ease ${n.delay + 0.1}s`,
-              }}
-            />
-          </g>
-        ))}
-      </svg>
+    <div
+      ref={containerRef}
+      className="relative w-full"
+      style={{ height: 360 }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0"
+        style={{ pointerEvents: 'none' }}
+      />
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Feature card component                                             */
+/* ------------------------------------------------------------------ */
+
 function FeatureCard({ feature, index }: { feature: FeatureDef; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const visibleRef = useRef(false);
   const [visible, setVisible] = useState(false);
+  const [canvasActive, setCanvasActive] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const el = ref.current;
+    if (!el) return;
+
+    // Observer for reveal animations (one-time trigger at 25% visibility)
+    const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !visibleRef.current) {
-            visibleRef.current = true;
+          if (entry.isIntersecting && !visible) {
             setVisible(true);
-            entry.target.querySelectorAll('.reveal').forEach((el, i) => {
-              setTimeout(() => el.classList.add('visible'), i * 100);
+            entry.target.querySelectorAll('.reveal').forEach((revealEl, i) => {
+              setTimeout(() => revealEl.classList.add('visible'), i * 100);
             });
           }
         });
       },
       { threshold: 0.25 }
     );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+
+    // Observer for canvas activation (start/pause based on viewport presence)
+    const canvasObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setCanvasActive(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.05 }
+    );
+
+    revealObserver.observe(el);
+    canvasObserver.observe(el);
+
+    return () => {
+      revealObserver.disconnect();
+      canvasObserver.disconnect();
+    };
+  }, [visible]);
 
   const isEven = index % 2 === 0;
 
@@ -231,7 +612,7 @@ function FeatureCard({ feature, index }: { feature: FeatureDef; index: number })
               border: `1px solid ${feature.nodeColor}0.15)`,
             }}
           >
-            <FeatureNodeDiagram feature={feature} visible={visible} />
+            <FeatureCanvasDiagram feature={feature} isVisible={canvasActive} />
 
             {/* Decorative corner marks */}
             <div className="absolute top-3 left-3 w-3 h-3" style={{ borderTop: `1px solid ${feature.accentColor}`, borderLeft: `1px solid ${feature.accentColor}`, opacity: 0.5 }} />
@@ -275,6 +656,10 @@ function FeatureCard({ feature, index }: { feature: FeatureDef; index: number })
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Public export                                                      */
+/* ------------------------------------------------------------------ */
 
 export function FeatureSections() {
   return (
