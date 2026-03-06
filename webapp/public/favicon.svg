@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <defs>
+    <linearGradient id="topFace" x1="50" y1="12" x2="66" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF2828"/>
+      <stop offset="100%" stop-color="#CC1A1A"/>
+    </linearGradient>
+    <linearGradient id="leftFace" x1="34" y1="30" x2="34" y2="71" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A81212"/>
+      <stop offset="100%" stop-color="#6B0808"/>
+    </linearGradient>
+    <linearGradient id="rightFace" x1="66" y1="30" x2="66" y2="71" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6B0808"/>
+      <stop offset="100%" stop-color="#2E0303"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="30" y1="14" x2="55" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#E82020" flood-opacity="0.55"/>
+    </filter>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1a0404"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+  </defs>
+  <rect width="100" height="100" fill="url(#bgGlow)" rx="16"/>
+  <g filter="url(#glow)">
+    <polygon points="50,48 82,30 82,53 50,71" fill="url(#rightFace)"/>
+    <polygon points="18,30 50,48 50,71 18,53" fill="url(#leftFace)"/>
+    <polygon points="50,12 82,30 50,48 18,30" fill="url(#topFace)"/>
+    <polygon points="50,12 82,30 50,48 18,30" fill="url(#shine)"/>
+  </g>
+  <line x1="50" y1="12" x2="18" y2="30" stroke="#FF7070" stroke-width="0.9" stroke-opacity="0.65" stroke-linecap="round"/>
+  <line x1="50" y1="12" x2="82" y2="30" stroke="#FF4444" stroke-width="0.6" stroke-opacity="0.4" stroke-linecap="round"/>
+  <line x1="50" y1="48" x2="50" y2="71" stroke="#880808" stroke-width="0.7" stroke-opacity="0.9" stroke-linecap="round"/>
+  <line x1="18" y1="30" x2="18" y2="53" stroke="#881010" stroke-width="0.6" stroke-opacity="0.5" stroke-linecap="round"/>
+  <line x1="82" y1="30" x2="82" y2="53" stroke="#440404" stroke-width="0.6" stroke-opacity="0.4" stroke-linecap="round"/>
+  <line x1="18" y1="53" x2="50" y2="71" stroke="#6B0808" stroke-width="0.6" stroke-opacity="0.5" stroke-linecap="round"/>
+  <line x1="82" y1="53" x2="50" y2="71" stroke="#330303" stroke-width="0.6" stroke-opacity="0.4" stroke-linecap="round"/>
+</svg>

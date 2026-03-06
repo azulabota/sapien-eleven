@@ -37,21 +37,43 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-7 h-7 flex items-center justify-center">
-              <div
-                className="absolute inset-0 rounded-full opacity-15 group-hover:opacity-30 transition-opacity"
-                style={{ background: 'rgba(220,40,40,1)' }}
-              />
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="3" fill="rgba(220,40,40,0.9)" />
-                <circle cx="3" cy="3" r="1.5" fill="rgba(160,160,160,0.5)" />
-                <circle cx="15" cy="3" r="1.5" fill="rgba(160,160,160,0.5)" />
-                <circle cx="3" cy="15" r="1.5" fill="rgba(160,160,160,0.5)" />
-                <circle cx="15" cy="15" r="1.5" fill="rgba(160,160,160,0.5)" />
-                <line x1="9" y1="9" x2="3" y2="3" stroke="rgba(160,160,160,0.3)" strokeWidth="0.8" />
-                <line x1="9" y1="9" x2="15" y2="3" stroke="rgba(160,160,160,0.3)" strokeWidth="0.8" />
-                <line x1="9" y1="9" x2="3" y2="15" stroke="rgba(160,160,160,0.3)" strokeWidth="0.8" />
-                <line x1="9" y1="9" x2="15" y2="15" stroke="rgba(160,160,160,0.3)" strokeWidth="0.8" />
+            <div className="relative w-8 h-8 flex items-center justify-center">
+              {/* 3D cube mark — matches favicon */}
+              <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 6px rgba(220,40,40,0.5))' }}>
+                <defs>
+                  <linearGradient id="navTopFace" x1="50" y1="12" x2="66" y2="48" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#FF2828"/>
+                    <stop offset="100%" stopColor="#CC1A1A"/>
+                  </linearGradient>
+                  <linearGradient id="navLeftFace" x1="34" y1="30" x2="34" y2="71" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#A81212"/>
+                    <stop offset="100%" stopColor="#6B0808"/>
+                  </linearGradient>
+                  <linearGradient id="navRightFace" x1="66" y1="30" x2="66" y2="71" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#6B0808"/>
+                    <stop offset="100%" stopColor="#2E0303"/>
+                  </linearGradient>
+                  <linearGradient id="navShine" x1="30" y1="14" x2="55" y2="38" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28"/>
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
+                  </linearGradient>
+                  <radialGradient id="navBg" cx="50%" cy="50%" r="60%">
+                    <stop offset="0%" stopColor="#1a0404"/>
+                    <stop offset="100%" stopColor="#080808"/>
+                  </radialGradient>
+                </defs>
+                <rect width="100" height="100" fill="url(#navBg)" rx="18"/>
+                <polygon points="50,48 82,30 82,53 50,71" fill="url(#navRightFace)"/>
+                <polygon points="18,30 50,48 50,71 18,53" fill="url(#navLeftFace)"/>
+                <polygon points="50,12 82,30 50,48 18,30" fill="url(#navTopFace)"/>
+                <polygon points="50,12 82,30 50,48 18,30" fill="url(#navShine)"/>
+                <line x1="50" y1="12" x2="18" y2="30" stroke="#FF7070" strokeWidth="0.9" strokeOpacity="0.65" strokeLinecap="round"/>
+                <line x1="50" y1="12" x2="82" y2="30" stroke="#FF4444" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
+                <line x1="50" y1="48" x2="50" y2="71" stroke="#880808" strokeWidth="0.7" strokeOpacity="0.9" strokeLinecap="round"/>
+                <line x1="18" y1="30" x2="18" y2="53" stroke="#881010" strokeWidth="0.6" strokeOpacity="0.5" strokeLinecap="round"/>
+                <line x1="82" y1="30" x2="82" y2="53" stroke="#440404" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
+                <line x1="18" y1="53" x2="50" y2="71" stroke="#6B0808" strokeWidth="0.6" strokeOpacity="0.5" strokeLinecap="round"/>
+                <line x1="82" y1="53" x2="50" y2="71" stroke="#330303" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
               </svg>
             </div>
             <div>
