@@ -21,7 +21,7 @@ interface EdgeData {
   travelTimer: number;
 }
 
-const RED = 'rgba(220, 40, 40,';
+const RED = 'rgba(202, 60, 61,';
 const SILVER = 'rgba(160, 160, 160,';
 
 export function GraphCanvas() {

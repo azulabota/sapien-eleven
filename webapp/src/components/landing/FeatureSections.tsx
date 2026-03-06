@@ -24,8 +24,8 @@ const features: FeatureDef[] = [
       'Consistency and accountability built into every interaction',
       'Simple, actionable next steps — no noise',
     ],
-    nodeColor: 'rgba(220,40,40,',
-    accentColor: 'rgba(220,40,40,0.9)',
+    nodeColor: 'rgba(202,60,61,',
+    accentColor: 'rgba(202,60,61,0.9)',
     nodePositions: [
       { x: 60, y: 60, r: 8, delay: 0 },
       { x: 120, y: 30, r: 5, delay: 0.3 },
@@ -80,8 +80,8 @@ const features: FeatureDef[] = [
       'Progressive overload calibrated to your actual capacity',
       'Sustainable long-term programming — not just 30-day plans',
     ],
-    nodeColor: 'rgba(220,40,40,',
-    accentColor: 'rgba(220,40,40,0.9)',
+    nodeColor: 'rgba(202,60,61,',
+    accentColor: 'rgba(202,60,61,0.9)',
     nodePositions: [
       { x: 70, y: 70, r: 8, delay: 0 },
       { x: 140, y: 60, r: 5, delay: 0.25 },

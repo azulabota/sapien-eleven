@@ -43,7 +43,7 @@ export function CTASection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 60% 70% at 50% 50%, rgba(220,40,40,0.06) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse 60% 70% at 50% 50%, rgba(202,60,61,0.06) 0%, transparent 65%)',
         }}
       />
       <div className="gradient-line absolute top-0 left-0 right-0" />
@@ -57,7 +57,7 @@ export function CTASection() {
             style={{ color: 'rgba(235,235,235,0.97)' }}
           >
             Get updates{' '}
-            <span className="text-glow" style={{ color: 'rgba(220,40,40,0.95)' }}>
+            <span className="text-glow" style={{ color: '#CA3C3D' }}>
               as we build.
             </span>
           </h2>
@@ -75,15 +75,15 @@ export function CTASection() {
             <div
               className="p-8 rounded text-center"
               style={{
-                background: 'rgba(220,40,40,0.04)',
-                border: '1px solid rgba(220,40,40,0.2)',
+                background: 'rgba(202,60,61,0.04)',
+                border: '1px solid rgba(202,60,61,0.2)',
               }}
             >
               <div className="flex items-center justify-center gap-3 mb-3">
                 <div className="node-dot" />
                 <p
                   className="font-display text-sm tracking-wider"
-                  style={{ color: 'rgba(220,80,80,0.9)', letterSpacing: '0.12em' }}
+                  style={{ color: '#CA3C3D', letterSpacing: '0.12em' }}
                 >
                   YOU ARE CONNECTED.
                 </p>
@@ -128,7 +128,7 @@ export function CTASection() {
           <div className="gradient-line flex-1" />
           <div className="flex gap-2 items-center">
             <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(160,160,160,0.25)' }} />
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(220,40,40,0.7)', boxShadow: '0 0 8px rgba(220,40,40,0.5)' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(202,60,61,0.7)', boxShadow: '0 0 8px rgba(202,60,61,0.5)' }} />
             <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(160,160,160,0.25)' }} />
           </div>
           <div className="gradient-line flex-1" />

@@ -48,7 +48,7 @@ function HeroGraphAnimation() {
           <line
             key={`out-${i}`}
             x1={hubX} y1={hubY} x2={hubX + o.dx} y2={hubY + o.dy}
-            stroke="rgba(220,40,40,0.45)"
+            stroke="rgba(202,60,61,0.45)"
             strokeWidth="1"
             style={{ opacity: phase === 'connected' ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.1 + 0.2}s` }}
           />
@@ -58,8 +58,8 @@ function HeroGraphAnimation() {
         {outputs.map((o, i) => (
           <g key={`outnode-${i}`} style={{ opacity: phase === 'connected' ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.1 + 0.4}s` }}>
             <rect x={hubX + o.dx + 2} y={hubY + o.dy - 9} width={62} height={16} rx="2"
-              fill="rgba(220,40,40,0.06)" stroke="rgba(220,40,40,0.3)" strokeWidth="0.6" />
-            <text x={hubX + o.dx + 5} y={hubY + o.dy + 2} fill="rgba(220,80,80,0.85)" fontSize="6.5" fontFamily="Orbitron, sans-serif" letterSpacing="0.8">
+              fill="rgba(202,60,61,0.06)" stroke="rgba(202,60,61,0.3)" strokeWidth="0.6" />
+            <text x={hubX + o.dx + 5} y={hubY + o.dy + 2} fill="rgba(202,60,61,0.85)" fontSize="6.5" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.8">
               {o.label.toUpperCase()}
             </text>
           </g>
@@ -74,13 +74,13 @@ function HeroGraphAnimation() {
           style={{ opacity: phase !== 'disconnected' ? 1 : 0, transition: 'opacity 0.5s ease 0.2s' }} />
 
         {/* Hub core */}
-        <circle cx={hubX} cy={hubY} r="14" fill="rgba(10,10,10,0.9)" stroke="rgba(220,40,40,0.7)" strokeWidth="1.5"
-          style={{ opacity: phase !== 'disconnected' ? 1 : 0, transition: 'opacity 0.5s ease 0.3s', filter: phase === 'connected' ? 'drop-shadow(0 0 12px rgba(220,40,40,0.7))' : 'none' }} />
-        <circle cx={hubX} cy={hubY} r="5" fill="rgba(220,40,40,0.9)"
+        <circle cx={hubX} cy={hubY} r="14" fill="rgba(10,10,10,0.9)" stroke="rgba(202,60,61,0.7)" strokeWidth="1.5"
+          style={{ opacity: phase !== 'disconnected' ? 1 : 0, transition: 'opacity 0.5s ease 0.3s', filter: phase === 'connected' ? 'drop-shadow(0 0 12px rgba(202,60,61,0.7))' : 'none' }} />
+        <circle cx={hubX} cy={hubY} r="5" fill="rgba(202,60,61,0.9)"
           style={{ opacity: phase === 'connected' ? 1 : 0, transition: 'opacity 0.4s ease' }} />
 
         {/* Hub label */}
-        <text x={hubX} y={hubY + 28} textAnchor="middle" fill="rgba(160,160,160,0.55)" fontSize="5.5" fontFamily="Orbitron, sans-serif" letterSpacing="0.6"
+        <text x={hubX} y={hubY + 28} textAnchor="middle" fill="rgba(160,160,160,0.55)" fontSize="5.5" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6"
           style={{ opacity: phase !== 'disconnected' ? 1 : 0, transition: 'opacity 0.4s ease 0.5s' }}>
           AI + DATA LAYER
         </text>
@@ -95,7 +95,7 @@ function HeroGraphAnimation() {
             <circle cx={c.x + 14} cy={c.y + 8} r="2" fill="rgba(120,120,120,0.25)" />
             <line x1={c.x} y1={c.y} x2={c.x - 14} y2={c.y + 12} stroke="rgba(120,120,120,0.2)" strokeWidth="0.6" />
             <line x1={c.x} y1={c.y} x2={c.x + 14} y2={c.y + 8} stroke="rgba(120,120,120,0.2)" strokeWidth="0.6" />
-            <text x={c.x} y={c.y - 12} textAnchor="middle" fill="rgba(140,140,140,0.55)" fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.5">
+            <text x={c.x} y={c.y - 12} textAnchor="middle" fill="rgba(140,140,140,0.55)" fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.5">
               {c.label.toUpperCase()}
             </text>
           </g>
@@ -121,7 +121,7 @@ export function HeroSection() {
     <section id="hero" ref={sectionRef} className="relative min-h-screen flex items-center py-32 px-6">
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(220,40,40,0.05) 0%, transparent 65%)' }}
+        style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(202,60,61,0.05) 0%, transparent 65%)' }}
       />
 
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -134,7 +134,7 @@ export function HeroSection() {
               style={{ fontSize: 'clamp(2.8rem, 6vw, 4.8rem)', color: 'rgba(235,235,235,0.97)' }}
             >
               Your health.{' '}
-              <span className="text-glow" style={{ color: 'rgba(220,40,40,0.95)' }}>
+              <span className="text-glow" style={{ color: '#CA3C3D' }}>
                 Connected.
               </span>
             </h1>
@@ -169,7 +169,7 @@ export function HeroSection() {
               { label: 'Integrated', value: '1 Layer' },
             ].map((s) => (
               <div key={s.label}>
-                <p className="font-display text-2xl font-bold" style={{ color: 'rgba(220,40,40,0.9)' }}>
+                <p className="font-display text-2xl font-bold" style={{ color: '#CA3C3D' }}>
                   {s.value}
                 </p>
                 <p className="font-ui text-xs tracking-wider mt-1" style={{ color: 'rgba(100,100,100,1)' }}>

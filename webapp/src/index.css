@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -22,7 +22,7 @@
     --popover-foreground: 0 0% 95%;
 
     /* Red as primary */
-    --primary: 0 85% 55%;
+    --primary: 0 63% 51%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 10%;
@@ -40,32 +40,32 @@
 
     --border: 0 0% 12%;
     --input: 0 0% 12%;
-    --ring: 0 85% 55%;
+    --ring: 0 63% 51%;
 
     --radius: 0.375rem;
 
     /* Custom Sapien Eleven tokens */
-    --red: 0 85% 55%;
-    --red-bright: 0 90% 65%;
-    --red-dim: 0 70% 38%;
+    --red: 0 63% 51%;
+    --red-bright: 0 63% 57%;
+    --red-dim: 0 57% 42%;
     --silver: 0 0% 65%;
     --silver-bright: 0 0% 80%;
     --silver-dim: 0 0% 35%;
     --black: 0 0% 4%;
     --black-mid: 0 0% 8%;
     --white: 0 0% 95%;
-    --node-color: 0 85% 55%;
-    --edge-color: 0 60% 40%;
+    --node-color: 0 63% 51%;
+    --edge-color: 0 57% 42%;
 
     /* Sidebar */
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 85% 55%;
+    --sidebar-primary: 0 63% 51%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 0 85% 55%;
+    --sidebar-ring: 0 63% 51%;
   }
 }
 
@@ -89,16 +89,16 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     letter-spacing: -0.02em;
   }
 
   .font-display {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   .font-body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
   .font-ui {
@@ -109,11 +109,11 @@
 @layer components {
   /* Red glow text effect */
   .text-glow {
-    text-shadow: 0 0 20px rgba(220, 40, 40, 0.8), 0 0 60px rgba(220, 40, 40, 0.35);
+    text-shadow: 0 0 20px rgba(202, 60, 61, 0.8), 0 0 60px rgba(202, 60, 61, 0.35);
   }
 
   .text-glow-sm {
-    text-shadow: 0 0 10px rgba(220, 40, 40, 0.6);
+    text-shadow: 0 0 10px rgba(202, 60, 61, 0.6);
   }
 
   /* Silver glow */
@@ -123,13 +123,13 @@
 
   /* Glowing border */
   .border-glow {
-    border-color: rgba(220, 40, 40, 0.35);
-    box-shadow: 0 0 12px rgba(220, 40, 40, 0.12), inset 0 0 12px rgba(220, 40, 40, 0.04);
+    border-color: rgba(202, 60, 61, 0.35);
+    box-shadow: 0 0 12px rgba(202, 60, 61, 0.12), inset 0 0 12px rgba(202, 60, 61, 0.04);
   }
 
   .border-glow-strong {
-    border-color: rgba(220, 40, 40, 0.6);
-    box-shadow: 0 0 24px rgba(220, 40, 40, 0.25), inset 0 0 24px rgba(220, 40, 40, 0.06);
+    border-color: rgba(202, 60, 61, 0.6);
+    box-shadow: 0 0 24px rgba(202, 60, 61, 0.25), inset 0 0 24px rgba(202, 60, 61, 0.06);
   }
 
   .border-glow-silver {
@@ -145,8 +145,8 @@
   }
 
   .card-glow:hover {
-    border-color: rgba(220, 40, 40, 0.3);
-    box-shadow: 0 0 30px rgba(220, 40, 40, 0.06);
+    border-color: rgba(202, 60, 61, 0.3);
+    box-shadow: 0 0 30px rgba(202, 60, 61, 0.06);
   }
 
   /* Node dot — red */
@@ -155,14 +155,14 @@
     height: 8px;
     border-radius: 50%;
     background: hsl(var(--red));
-    box-shadow: 0 0 8px rgba(220, 40, 40, 0.8), 0 0 20px rgba(220, 40, 40, 0.35);
+    box-shadow: 0 0 8px rgba(202, 60, 61, 0.8), 0 0 20px rgba(202, 60, 61, 0.35);
   }
 
   /* CTA button */
   .btn-primary {
     background: hsl(var(--red));
     color: hsl(var(--white));
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 600;
     letter-spacing: 0.08em;
     font-size: 0.75rem;
@@ -189,14 +189,14 @@
 
   .btn-primary:hover {
     background: hsl(var(--red-bright));
-    box-shadow: 0 0 24px rgba(220, 40, 40, 0.5), 0 0 60px rgba(220, 40, 40, 0.18);
+    box-shadow: 0 0 24px rgba(202, 60, 61, 0.5), 0 0 60px rgba(202, 60, 61, 0.18);
     transform: translateY(-1px);
   }
 
   .btn-ghost {
     background: transparent;
     color: hsl(var(--silver-bright));
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 600;
     letter-spacing: 0.08em;
     font-size: 0.75rem;
@@ -216,9 +216,9 @@
 
   /* Section label */
   .section-label {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.6rem;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     color: hsl(var(--red));
   }
@@ -226,7 +226,7 @@
   /* Gradient divider */
   .gradient-line {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(220, 40, 40, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(202, 60, 61, 0.4), transparent);
   }
 
   .gradient-line-silver {
@@ -248,8 +248,8 @@
   }
 
   .input-cyber:focus {
-    border-color: rgba(220, 40, 40, 0.5);
-    box-shadow: 0 0 0 3px rgba(220, 40, 40, 0.07);
+    border-color: rgba(202, 60, 61, 0.5);
+    box-shadow: 0 0 0 3px rgba(202, 60, 61, 0.07);
   }
 
   .input-cyber::placeholder {
@@ -279,8 +279,8 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(220, 40, 40, 0.25); }
-  50% { box-shadow: 0 0 40px rgba(220, 40, 40, 0.5), 0 0 80px rgba(220, 40, 40, 0.15); }
+  0%, 100% { box-shadow: 0 0 20px rgba(202, 60, 61, 0.25); }
+  50% { box-shadow: 0 0 40px rgba(202, 60, 61, 0.5), 0 0 80px rgba(202, 60, 61, 0.15); }
 }
 
 @keyframes spin-slow {
