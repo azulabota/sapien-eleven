@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
 
-const navLinks = [
-  { label: 'Problem', href: '#problem' },
-  { label: 'Coaching', href: '#coaching' },
-  { label: 'Nutrition', href: '#nutrition' },
-  { label: 'Fitness', href: '#fitness' },
-  { label: 'Mental Health', href: '#mental-health' },
-  { label: 'Data Layer', href: '#data-layer' },
-];
-
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -92,26 +83,33 @@ export function Nav() {
             </div>
           </a>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="font-ui text-xs tracking-widest uppercase transition-colors duration-200"
-                style={{ color: 'rgba(130,130,130,1)', letterSpacing: '0.14em' }}
-                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = '#F3F4F6'; }}
-                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'rgba(130,130,130,1)'; }}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-
           {/* CTA */}
-          <div className="hidden lg:block">
-            <button className="btn-primary" onClick={handleCTA}>
-              Get Early Access
+          <div className="hidden lg:flex items-center gap-5">
+            <span
+              className="font-ui text-xs tracking-wider"
+              style={{ color: 'rgba(160,160,160,0.7)', letterSpacing: '0.1em' }}
+            >
+              Mobile App Coming Soon!
+            </span>
+            <button
+              className="font-ui text-xs tracking-wider px-5 py-2 rounded transition-all duration-200"
+              style={{
+                color: 'rgba(220,220,220,0.9)',
+                border: '1px solid rgba(202,60,61,0.7)',
+                background: 'transparent',
+                letterSpacing: '0.1em',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(202,60,61,0.12)';
+                (e.currentTarget as HTMLElement).style.borderColor = '#CA3C3D';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'transparent';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(202,60,61,0.7)';
+              }}
+              onClick={handleCTA}
+            >
+              Become a Beta Tester
             </button>
           </div>
 
@@ -136,19 +134,8 @@ export function Nav() {
           className="lg:hidden px-6 pb-6 pt-2 space-y-4"
           style={{ background: 'rgba(8,8,8,0.97)', borderBottom: '1px solid rgba(202,60,61,0.12)' }}
         >
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="block font-ui text-xs tracking-widest uppercase py-2"
-              style={{ color: 'rgba(130,130,130,1)', letterSpacing: '0.14em' }}
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
           <button className="btn-primary w-full mt-4" onClick={handleCTA}>
-            Get Early Access
+            Become a Beta Tester
           </button>
         </div>
       )}

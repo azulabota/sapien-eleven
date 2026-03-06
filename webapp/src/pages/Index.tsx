@@ -16,8 +16,8 @@ export default function Index() {
       {/* Content layer */}
       <div className="relative" style={{ zIndex: 1 }}>
         <Nav />
-        <ProblemSection />
         <HeroSection />
+        <ProblemSection />
         <FeatureSections />
         <DataLayerSection />
         <CTASection />
