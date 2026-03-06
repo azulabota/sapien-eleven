@@ -1,98 +1,307 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-function HexLogoAnimated() {
-  const [phase, setPhase] = useState<'idle' | 'pulse'>('idle');
+interface SphereNode {
+  x: number;
+  y: number;
+  z: number;
+  baseSize: number;
+  isRed: boolean;
+  pulseOffset: number;
+}
+
+interface DataPulse {
+  fromIdx: number;
+  toIdx: number;
+  progress: number;
+  speed: number;
+  isRed: boolean;
+}
+
+function DataSphereAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
-  useEffect(() => {
-    const t = setTimeout(() => setPhase('pulse'), 600);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Small orbiting particles around the hex logo
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
-    const cx = W / 2;
-    const cy = H / 2;
+    const SIZE = 400;
+    const DPR = window.devicePixelRatio || 1;
+    canvas.width = SIZE * DPR;
+    canvas.height = SIZE * DPR;
+    ctx.scale(DPR, DPR);
 
-    const particles: { angle: number; radius: number; speed: number; size: number; opacity: number }[] = [];
-    for (let i = 0; i < 18; i++) {
-      particles.push({
-        angle: (Math.PI * 2 * i) / 18 + Math.random() * 0.5,
-        radius: 120 + Math.random() * 60,
-        speed: (0.004 + Math.random() * 0.006) * (Math.random() > 0.5 ? 1 : -1),
-        size: 1 + Math.random() * 2,
-        opacity: 0.15 + Math.random() * 0.3,
+    const cx = SIZE / 2;
+    const cy = SIZE / 2;
+    const sphereRadius = 140;
+    const perspective = 600;
+    const nodeCount = 120;
+    const connectionDist = 0.7; // max distance ratio for connections
+
+    // Generate fibonacci sphere points
+    const nodes: SphereNode[] = [];
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+    for (let i = 0; i < nodeCount; i++) {
+      const y = 1 - (i / (nodeCount - 1)) * 2; // y goes from 1 to -1
+      const radiusAtY = Math.sqrt(1 - y * y);
+      const theta = goldenAngle * i;
+
+      nodes.push({
+        x: Math.cos(theta) * radiusAtY,
+        y: y,
+        z: Math.sin(theta) * radiusAtY,
+        baseSize: 1.2 + Math.random() * 1.8,
+        isRed: Math.random() < 0.4,
+        pulseOffset: Math.random() * Math.PI * 2,
       });
     }
 
-    const draw = () => {
-      ctx.clearRect(0, 0, W, H);
+    // Pre-compute connections (pairs of node indices that are close enough)
+    const connections: [number, number][] = [];
+    for (let i = 0; i < nodeCount; i++) {
+      for (let j = i + 1; j < nodeCount; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dz = nodes[i].z - nodes[j].z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < connectionDist) {
+          connections.push([i, j]);
+        }
+      }
+    }
 
-      // Draw orbital rings
+    // Data pulses that travel along connections
+    const pulses: DataPulse[] = [];
+    const maxPulses = 25;
+
+    function spawnPulse() {
+      if (pulses.length >= maxPulses || connections.length === 0) return;
+      const connIdx = Math.floor(Math.random() * connections.length);
+      const [from, to] = connections[connIdx];
+      pulses.push({
+        fromIdx: from,
+        toIdx: to,
+        progress: 0,
+        speed: 0.005 + Math.random() * 0.012,
+        isRed: Math.random() < 0.5,
+      });
+    }
+
+    // Seed initial pulses
+    for (let i = 0; i < 15; i++) {
+      spawnPulse();
+      // randomize initial progress
+      if (pulses[i]) pulses[i].progress = Math.random();
+    }
+
+    let rotY = 0;
+    let rotX = 0.3; // slight tilt
+    let time = 0;
+
+    function project(x: number, y: number, z: number): { px: number; py: number; scale: number; depth: number } {
+      const scale = perspective / (perspective + z * sphereRadius);
+      return {
+        px: cx + x * sphereRadius * scale,
+        py: cy + y * sphereRadius * scale,
+        scale,
+        depth: z,
+      };
+    }
+
+    function rotatePoint(x: number, y: number, z: number, angleY: number, angleX: number) {
+      // Rotate around Y axis
+      let cosA = Math.cos(angleY);
+      let sinA = Math.sin(angleY);
+      const nx = x * cosA + z * sinA;
+      let nz = -x * sinA + z * cosA;
+
+      // Rotate around X axis
+      cosA = Math.cos(angleX);
+      sinA = Math.sin(angleX);
+      const ny = y * cosA - nz * sinA;
+      nz = y * sinA + nz * cosA;
+
+      return { x: nx, y: ny, z: nz };
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+      time += 0.016;
+      rotY += 0.003;
+      rotX = 0.3 + Math.sin(time * 0.2) * 0.1; // gentle wobble
+
+      // Outer glow ring
+      const ringGlow = ctx.createRadialGradient(cx, cy, sphereRadius * 0.95, cx, cy, sphereRadius * 1.35);
+      ringGlow.addColorStop(0, 'rgba(202,60,61,0)');
+      ringGlow.addColorStop(0.5, `rgba(202,60,61,${0.04 + Math.sin(time * 0.8) * 0.02})`);
+      ringGlow.addColorStop(0.7, `rgba(202,60,61,${0.02 + Math.sin(time * 0.8) * 0.01})`);
+      ringGlow.addColorStop(1, 'rgba(202,60,61,0)');
       ctx.beginPath();
-      ctx.arc(cx, cy, 148, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(202,60,61,0.06)';
+      ctx.arc(cx, cy, sphereRadius * 1.35, 0, Math.PI * 2);
+      ctx.fillStyle = ringGlow;
+      ctx.fill();
+
+      // Subtle ambient glow at center
+      const ambientGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, sphereRadius * 0.8);
+      ambientGlow.addColorStop(0, 'rgba(202,60,61,0.03)');
+      ambientGlow.addColorStop(0.5, 'rgba(202,60,61,0.01)');
+      ambientGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, sphereRadius * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = ambientGlow;
+      ctx.fill();
+
+      // Transform and project all nodes
+      const projected: { px: number; py: number; scale: number; depth: number; idx: number }[] = [];
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const r = rotatePoint(n.x, n.y, n.z, rotY, rotX);
+        const p = project(r.x, r.y, r.z);
+        projected.push({ ...p, idx: i });
+      }
+
+      // Sort by depth (back to front)
+      projected.sort((a, b) => a.depth - b.depth);
+
+      // Build lookup for fast access by index
+      const projMap = new Map<number, { px: number; py: number; scale: number; depth: number }>();
+      for (const p of projected) {
+        projMap.set(p.idx, p);
+      }
+
+      // Draw connections (lines between nearby nodes)
+      for (const [i, j] of connections) {
+        const pA = projMap.get(i);
+        const pB = projMap.get(j);
+        if (!pA || !pB) continue;
+
+        // Fade based on average depth (back nodes are more transparent)
+        const avgDepth = (pA.depth + pB.depth) / 2;
+        const depthFactor = (avgDepth + 1) / 2; // 0 (back) to 1 (front)
+        const alpha = 0.03 + depthFactor * 0.08;
+
+        const nodeA = nodes[i];
+        const nodeB = nodes[j];
+        const isRedConnection = nodeA.isRed && nodeB.isRed;
+
+        ctx.beginPath();
+        ctx.moveTo(pA.px, pA.py);
+        ctx.lineTo(pB.px, pB.py);
+        ctx.strokeStyle = isRedConnection
+          ? `rgba(202,60,61,${alpha})`
+          : `rgba(160,160,160,${alpha * 0.7})`;
+        ctx.lineWidth = 0.4 + depthFactor * 0.3;
+        ctx.stroke();
+      }
+
+      // Draw data pulses traveling along connections
+      for (let p = pulses.length - 1; p >= 0; p--) {
+        const pulse = pulses[p];
+        pulse.progress += pulse.speed;
+
+        if (pulse.progress >= 1) {
+          pulses.splice(p, 1);
+          spawnPulse();
+          continue;
+        }
+
+        const pFrom = projMap.get(pulse.fromIdx);
+        const pTo = projMap.get(pulse.toIdx);
+        if (!pFrom || !pTo) continue;
+
+        const px = pFrom.px + (pTo.px - pFrom.px) * pulse.progress;
+        const py = pFrom.py + (pTo.py - pFrom.py) * pulse.progress;
+        const avgDepth = (pFrom.depth + pTo.depth) / 2;
+        const depthFactor = (avgDepth + 1) / 2;
+        const pulseAlpha = 0.3 + depthFactor * 0.5;
+        const pulseSize = 1.5 + depthFactor * 1.5;
+
+        // Pulse glow
+        const pulseGrad = ctx.createRadialGradient(px, py, 0, px, py, pulseSize * 4);
+        if (pulse.isRed) {
+          pulseGrad.addColorStop(0, `rgba(202,60,61,${pulseAlpha * 0.5})`);
+        } else {
+          pulseGrad.addColorStop(0, `rgba(220,220,220,${pulseAlpha * 0.4})`);
+        }
+        pulseGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(px, py, pulseSize * 4, 0, Math.PI * 2);
+        ctx.fillStyle = pulseGrad;
+        ctx.fill();
+
+        // Pulse core
+        ctx.beginPath();
+        ctx.arc(px, py, pulseSize, 0, Math.PI * 2);
+        ctx.fillStyle = pulse.isRed
+          ? `rgba(202,60,61,${pulseAlpha})`
+          : `rgba(220,220,220,${pulseAlpha})`;
+        ctx.fill();
+      }
+
+      // Spawn new pulses periodically
+      if (Math.random() < 0.04) {
+        spawnPulse();
+      }
+
+      // Draw nodes (sorted back to front for proper layering)
+      for (const p of projected) {
+        const node = nodes[p.idx];
+        const depthFactor = (p.depth + 1) / 2; // 0..1
+        const pulse = Math.sin(time * 2 + node.pulseOffset) * 0.3 + 0.7;
+        const size = node.baseSize * p.scale * pulse;
+        const alpha = (0.15 + depthFactor * 0.65) * pulse;
+
+        // Node glow
+        const glowRadius = size * 4;
+        const nodeGlow = ctx.createRadialGradient(p.px, p.py, 0, p.px, p.py, glowRadius);
+        if (node.isRed) {
+          nodeGlow.addColorStop(0, `rgba(202,60,61,${alpha * 0.35})`);
+          nodeGlow.addColorStop(0.5, `rgba(202,60,61,${alpha * 0.1})`);
+        } else {
+          nodeGlow.addColorStop(0, `rgba(180,180,180,${alpha * 0.25})`);
+          nodeGlow.addColorStop(0.5, `rgba(160,160,160,${alpha * 0.08})`);
+        }
+        nodeGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(p.px, p.py, glowRadius, 0, Math.PI * 2);
+        ctx.fillStyle = nodeGlow;
+        ctx.fill();
+
+        // Node core
+        ctx.beginPath();
+        ctx.arc(p.px, p.py, size, 0, Math.PI * 2);
+        ctx.fillStyle = node.isRed
+          ? `rgba(202,60,61,${alpha})`
+          : `rgba(190,190,190,${alpha})`;
+        ctx.fill();
+
+        // Bright center highlight for front-facing nodes
+        if (depthFactor > 0.6) {
+          ctx.beginPath();
+          ctx.arc(p.px, p.py, size * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = node.isRed
+            ? `rgba(255,120,120,${(depthFactor - 0.6) * 0.8})`
+            : `rgba(255,255,255,${(depthFactor - 0.6) * 0.6})`;
+          ctx.fill();
+        }
+      }
+
+      // Outer ring stroke (subtle)
+      ctx.beginPath();
+      ctx.arc(cx, cy, sphereRadius * 1.08, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(202,60,61,${0.06 + Math.sin(time * 1.2) * 0.03})`;
       ctx.lineWidth = 0.8;
       ctx.stroke();
 
+      // Second outer ring
       ctx.beginPath();
-      ctx.arc(cx, cy, 178, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(160,160,160,0.04)';
-      ctx.lineWidth = 0.6;
+      ctx.arc(cx, cy, sphereRadius * 1.2, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(160,160,160,${0.03 + Math.sin(time * 0.9) * 0.015})`;
+      ctx.lineWidth = 0.5;
       ctx.stroke();
-
-      // Draw particles
-      for (const p of particles) {
-        p.angle += p.speed;
-        const px = cx + Math.cos(p.angle) * p.radius;
-        const py = cy + Math.sin(p.angle) * p.radius;
-
-        const isRed = Math.abs(p.speed) > 0.007;
-        const col = isRed ? `rgba(202,60,61,${p.opacity})` : `rgba(160,160,160,${p.opacity})`;
-
-        // Glow
-        const grad = ctx.createRadialGradient(px, py, 0, px, py, p.size * 3);
-        grad.addColorStop(0, isRed ? `rgba(202,60,61,${p.opacity * 0.4})` : `rgba(160,160,160,${p.opacity * 0.3})`);
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath();
-        ctx.arc(px, py, p.size * 3, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(px, py, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = col;
-        ctx.fill();
-      }
-
-      // Thin connecting lines between nearby particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const pA = particles[i];
-          const pB = particles[j];
-          const ax = cx + Math.cos(pA.angle) * pA.radius;
-          const ay = cy + Math.sin(pA.angle) * pA.radius;
-          const bx = cx + Math.cos(pB.angle) * pB.radius;
-          const by = cy + Math.sin(pB.angle) * pB.radius;
-          const dist = Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
-          if (dist < 90) {
-            ctx.beginPath();
-            ctx.moveTo(ax, ay);
-            ctx.lineTo(bx, by);
-            ctx.strokeStyle = `rgba(160,160,160,${0.04 * (1 - dist / 90)})`;
-            ctx.lineWidth = 0.4;
-            ctx.stroke();
-          }
-        }
-      }
 
       animRef.current = requestAnimationFrame(draw);
     };
@@ -102,85 +311,10 @@ function HexLogoAnimated() {
   }, []);
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 360, height: 360 }}>
-      {/* Particle orbit canvas */}
+    <div className="relative flex items-center justify-center" style={{ width: 400, height: 400 }}>
       <canvas
         ref={canvasRef}
-        width={360}
-        height={360}
-        className="absolute inset-0"
-        style={{ pointerEvents: 'none' }}
-      />
-
-      {/* Hex S logo */}
-      <div
-        style={{
-          position: 'relative',
-          transition: 'filter 0.8s ease',
-          filter: phase === 'pulse'
-            ? 'drop-shadow(0 0 40px rgba(202,60,61,0.55)) drop-shadow(0 0 80px rgba(202,60,61,0.2))'
-            : 'drop-shadow(0 0 12px rgba(202,60,61,0.3))',
-        }}
-      >
-        <svg width="200" height="220" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="hexTop" x1="100" y1="0" x2="100" y2="110" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#CA3C3D"/>
-              <stop offset="100%" stopColor="#8B1A1A"/>
-            </linearGradient>
-            <linearGradient id="hexBottom" x1="100" y1="110" x2="100" y2="220" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#7A1515"/>
-              <stop offset="100%" stopColor="#CA3C3D"/>
-            </linearGradient>
-            <linearGradient id="sGrad" x1="60" y1="60" x2="140" y2="160" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#1a0505"/>
-              <stop offset="100%" stopColor="#0d0202"/>
-            </linearGradient>
-          </defs>
-
-          {/* Outer hexagon */}
-          <polygon
-            points="100,4 186,52 186,148 100,196 14,148 14,52"
-            fill="url(#hexTop)"
-          />
-
-          {/* Inner dark hex cutout offset for 3D depth */}
-          <polygon
-            points="100,18 172,60 172,144 100,182 28,144 28,60"
-            fill="#0d0202"
-          />
-
-          {/* S shape — built from two arcs/rectangles to mimic the brand S */}
-          {/* Top arc of S */}
-          <path
-            d="M 78,72 C 78,60 88,54 100,54 C 116,54 128,62 128,76 C 128,88 118,95 104,100 L 96,104 C 80,110 70,118 70,134 C 70,150 82,160 100,160 C 118,160 132,150 132,136"
-            stroke="#CA3C3D"
-            strokeWidth="14"
-            strokeLinecap="round"
-            fill="none"
-          />
-          {/* Top bar */}
-          <line x1="78" y1="72" x2="128" y2="72" stroke="#CA3C3D" strokeWidth="14" strokeLinecap="round"/>
-          {/* Bottom bar */}
-          <line x1="68" y1="148" x2="130" y2="148" stroke="#CA3C3D" strokeWidth="14" strokeLinecap="round"/>
-
-          {/* Shine overlay */}
-          <polygon
-            points="100,4 186,52 143,52 80,20 56,34 14,52 100,4"
-            fill="rgba(255,255,255,0.07)"
-          />
-        </svg>
-      </div>
-
-      {/* Pulsing ring */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          width: 260,
-          height: 260,
-          border: '1px solid rgba(202,60,61,0.15)',
-          animation: 'glow-pulse 3s ease-in-out infinite',
-        }}
+        style={{ width: 400, height: 400, pointerEvents: 'none' }}
       />
     </div>
   );
@@ -278,9 +412,9 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Right: animated hex logo with orbiting nodes */}
+        {/* Right: animated data sphere visualization */}
         <div className="hero-reveal flex items-center justify-center lg:justify-end">
-          <HexLogoAnimated />
+          <DataSphereAnimation />
         </div>
       </div>
 
