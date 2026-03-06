@@ -9,7 +9,7 @@ interface NodeData {
   pulsePhase: number;
   pulseSpeed: number;
   opacity: number;
-  cluster: number;
+  type: 'red' | 'silver';
 }
 
 interface EdgeData {
@@ -21,26 +21,24 @@ interface EdgeData {
   travelTimer: number;
 }
 
-const CYAN = 'rgba(14, 213, 237,';
-const CYAN_DIM = 'rgba(14, 213, 237,';
+const RED = 'rgba(220, 40, 40,';
+const SILVER = 'rgba(160, 160, 160,';
 
 export function GraphCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const nodesRef = useRef<NodeData[]>([]);
   const edgesRef = useRef<EdgeData[]>([]);
-  const timeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const resize = () => {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight * 5; // tall enough for full page
+      canvas.height = window.innerHeight * 5;
       initGraph();
     };
 
@@ -50,25 +48,23 @@ export function GraphCanvas() {
       const nodes: NodeData[] = [];
       const edges: EdgeData[] = [];
 
-      // Create distributed nodes across the full canvas height
-      const nodeCount = Math.floor((W * H) / 28000);
-      const clamped = Math.min(Math.max(nodeCount, 40), 120);
+      const nodeCount = Math.min(Math.max(Math.floor((W * H) / 28000), 40), 110);
 
-      for (let i = 0; i < clamped; i++) {
+      for (let i = 0; i < nodeCount; i++) {
         nodes.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          vx: (Math.random() - 0.5) * 0.18,
-          vy: (Math.random() - 0.5) * 0.18,
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: (Math.random() - 0.5) * 0.15,
           radius: Math.random() * 1.5 + 1,
           pulsePhase: Math.random() * Math.PI * 2,
-          pulseSpeed: 0.008 + Math.random() * 0.012,
-          opacity: 0.3 + Math.random() * 0.4,
-          cluster: Math.floor(Math.random() * 6),
+          pulseSpeed: 0.007 + Math.random() * 0.01,
+          opacity: 0.25 + Math.random() * 0.35,
+          // mix: mostly silver, occasional red
+          type: Math.random() < 0.25 ? 'red' : 'silver',
         });
       }
 
-      // Build edges: connect nearby nodes
       const maxDist = Math.min(W, 600) * 0.22;
       for (let i = 0; i < nodes.length; i++) {
         let connections = 0;
@@ -76,15 +72,14 @@ export function GraphCanvas() {
           if (connections >= 3) break;
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
+          if (Math.sqrt(dx * dx + dy * dy) < maxDist) {
             edges.push({
               from: i,
               to: j,
               travelProgress: 0,
-              travelSpeed: 0.004 + Math.random() * 0.006,
+              travelSpeed: 0.004 + Math.random() * 0.005,
               travelActive: false,
-              travelTimer: Math.random() * 300,
+              travelTimer: Math.random() * 320,
             });
             connections++;
           }
@@ -100,12 +95,9 @@ export function GraphCanvas() {
       const H = canvas.height;
       const nodes = nodesRef.current;
       const edges = edgesRef.current;
-      timeRef.current += 1;
-      const t = timeRef.current;
 
       ctx.clearRect(0, 0, W, H);
 
-      // Draw edges
       for (const edge of edges) {
         const nA = nodes[edge.from];
         const nB = nodes[edge.to];
@@ -115,43 +107,44 @@ export function GraphCanvas() {
         const dy = nB.y - nA.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const maxDist = Math.min(W, 600) * 0.22;
-        const alpha = (1 - dist / maxDist) * 0.08;
+        // Use red for edges between red nodes, silver otherwise
+        const isRedEdge = nA.type === 'red' && nB.type === 'red';
+        const col = isRedEdge ? RED : SILVER;
+        const alpha = (1 - dist / maxDist) * 0.07;
 
-        // Draw static edge
         ctx.beginPath();
         ctx.moveTo(nA.x, nA.y);
         ctx.lineTo(nB.x, nB.y);
-        ctx.strokeStyle = `${CYAN_DIM} ${alpha})`;
+        ctx.strokeStyle = `${col} ${alpha})`;
         ctx.lineWidth = 0.5;
         ctx.stroke();
 
-        // Traveling data packet
+        // Traveling packet
         edge.travelTimer--;
         if (edge.travelTimer <= 0 && !edge.travelActive) {
           edge.travelActive = true;
           edge.travelProgress = 0;
-          edge.travelTimer = 200 + Math.random() * 400;
+          edge.travelTimer = 180 + Math.random() * 380;
         }
-
         if (edge.travelActive) {
           edge.travelProgress += edge.travelSpeed;
           const px = nA.x + dx * edge.travelProgress;
           const py = nA.y + dy * edge.travelProgress;
+          const packetAlpha = Math.sin(edge.travelProgress * Math.PI) * 0.8;
+          const packetCol = isRedEdge ? RED : SILVER;
 
-          const packetAlpha = Math.sin(edge.travelProgress * Math.PI) * 0.9;
           ctx.beginPath();
           ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = `${CYAN} ${packetAlpha})`;
+          ctx.fillStyle = `${packetCol} ${packetAlpha})`;
           ctx.fill();
 
-          // Trail
           const trail1x = nA.x + dx * (edge.travelProgress - 0.05);
           const trail1y = nA.y + dy * (edge.travelProgress - 0.05);
           ctx.beginPath();
           ctx.moveTo(trail1x, trail1y);
           ctx.lineTo(px, py);
-          ctx.strokeStyle = `${CYAN} ${packetAlpha * 0.5})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = `${packetCol} ${packetAlpha * 0.4})`;
+          ctx.lineWidth = 0.7;
           ctx.stroke();
 
           if (edge.travelProgress >= 1) {
@@ -161,40 +154,31 @@ export function GraphCanvas() {
         }
       }
 
-      // Draw nodes
       for (const node of nodes) {
-        // Update position
         node.x += node.vx;
         node.y += node.vy;
-
         if (node.x < 0 || node.x > W) node.vx *= -1;
         if (node.y < 0 || node.y > H) node.vy *= -1;
-
         node.x = Math.max(0, Math.min(W, node.x));
         node.y = Math.max(0, Math.min(H, node.y));
 
-        // Pulse
         node.pulsePhase += node.pulseSpeed;
         const pulse = 0.5 + 0.5 * Math.sin(node.pulsePhase);
         const alpha = node.opacity * (0.6 + 0.4 * pulse);
+        const col = node.type === 'red' ? RED : SILVER;
 
-        // Outer glow
         const glowRadius = node.radius * (2.5 + pulse * 1.5);
-        const gradient = ctx.createRadialGradient(
-          node.x, node.y, 0,
-          node.x, node.y, glowRadius
-        );
-        gradient.addColorStop(0, `${CYAN} ${alpha * 0.4})`);
-        gradient.addColorStop(1, `${CYAN} 0)`);
+        const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowRadius);
+        gradient.addColorStop(0, `${col} ${alpha * 0.3})`);
+        gradient.addColorStop(1, `${col} 0)`);
         ctx.beginPath();
         ctx.arc(node.x, node.y, glowRadius, 0, Math.PI * 2);
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        // Core dot
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `${CYAN} ${alpha})`;
+        ctx.fillStyle = `${col} ${alpha})`;
         ctx.fill();
       }
 
@@ -204,7 +188,6 @@ export function GraphCanvas() {
     resize();
     draw();
     window.addEventListener('resize', resize);
-
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
@@ -215,7 +198,7 @@ export function GraphCanvas() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full pointer-events-none"
-      style={{ zIndex: 0, opacity: 0.7 }}
+      style={{ zIndex: 0, opacity: 0.65 }}
     />
   );
 }

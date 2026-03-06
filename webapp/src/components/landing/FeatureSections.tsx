@@ -24,8 +24,8 @@ const features: FeatureDef[] = [
       'Consistency and accountability built into every interaction',
       'Simple, actionable next steps — no noise',
     ],
-    nodeColor: 'rgba(14,213,237,',
-    accentColor: 'hsl(191 100% 60%)',
+    nodeColor: 'rgba(220,40,40,',
+    accentColor: 'rgba(220,40,40,0.9)',
     nodePositions: [
       { x: 60, y: 60, r: 8, delay: 0 },
       { x: 120, y: 30, r: 5, delay: 0.3 },
@@ -51,8 +51,8 @@ const features: FeatureDef[] = [
       'Personalized meal plan generation that updates with you',
       'Habit-based coaching to build sustainable patterns',
     ],
-    nodeColor: 'rgba(80,200,120,',
-    accentColor: 'hsl(145 60% 55%)',
+    nodeColor: 'rgba(190,190,190,',
+    accentColor: 'rgba(200,200,200,0.85)',
     nodePositions: [
       { x: 80, y: 80, r: 8, delay: 0 },
       { x: 30, y: 50, r: 4, delay: 0.2 },
@@ -80,8 +80,8 @@ const features: FeatureDef[] = [
       'Progressive overload calibrated to your actual capacity',
       'Sustainable long-term programming — not just 30-day plans',
     ],
-    nodeColor: 'rgba(255,140,60,',
-    accentColor: 'hsl(25 90% 60%)',
+    nodeColor: 'rgba(220,40,40,',
+    accentColor: 'rgba(220,40,40,0.9)',
     nodePositions: [
       { x: 70, y: 70, r: 8, delay: 0 },
       { x: 140, y: 60, r: 5, delay: 0.25 },
@@ -107,8 +107,8 @@ const features: FeatureDef[] = [
       'Friction-reducing prompts that meet you where you are',
       'Coaching that accounts for your mental state before advising on the physical',
     ],
-    nodeColor: 'rgba(160,110,240,',
-    accentColor: 'hsl(270 70% 65%)',
+    nodeColor: 'rgba(190,190,190,',
+    accentColor: 'rgba(190,190,190,0.85)',
     nodePositions: [
       { x: 90, y: 80, r: 8, delay: 0 },
       { x: 150, y: 50, r: 4, delay: 0.3 },
@@ -158,7 +158,7 @@ function FeatureNodeDiagram({ feature, visible }: { feature: FeatureDef; visible
             />
             <circle
               cx={n.x} cy={n.y} r={n.r}
-              fill="rgba(8,14,26,0.8)"
+              fill="rgba(10,10,10,0.85)"
               stroke={`${feature.nodeColor}0.7)`}
               strokeWidth="1"
               style={{
@@ -227,7 +227,7 @@ function FeatureCard({ feature, index }: { feature: FeatureDef; index: number })
           <div
             className="relative p-8 rounded"
             style={{
-              background: 'rgba(8,14,26,0.6)',
+              background: 'rgba(10,10,10,0.7)',
               border: `1px solid ${feature.nodeColor}0.15)`,
             }}
           >
@@ -247,13 +247,13 @@ function FeatureCard({ feature, index }: { feature: FeatureDef; index: number })
             <p className="section-label mb-4" style={{ color: feature.accentColor }}>{feature.label}</p>
             <h2
               className="font-display text-3xl lg:text-4xl font-bold leading-tight"
-              style={{ color: 'hsl(210 20% 93%)' }}
+              style={{ color: 'rgba(225,225,225,0.92)' }}
             >
               {feature.headline}
             </h2>
           </div>
 
-          <p className="reveal font-body text-base leading-relaxed" style={{ color: 'hsl(220 15% 55%)' }}>
+          <p className="reveal font-body text-base leading-relaxed" style={{ color: 'rgba(120,120,120,1)' }}>
             {feature.subline}
           </p>
 
@@ -264,7 +264,7 @@ function FeatureCard({ feature, index }: { feature: FeatureDef; index: number })
                   className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full"
                   style={{ background: feature.accentColor, boxShadow: `0 0 6px ${feature.accentColor}` }}
                 />
-                <span className="font-ui text-sm leading-relaxed" style={{ color: 'hsl(220 15% 62%)' }}>
+                <span className="font-ui text-sm leading-relaxed" style={{ color: 'rgba(120,120,120,1)' }}>
                   {b}
                 </span>
               </li>

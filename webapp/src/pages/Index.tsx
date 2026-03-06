@@ -9,7 +9,7 @@ import { Footer } from '@/components/landing/Footer';
 
 export default function Index() {
   return (
-    <div className="relative min-h-screen" style={{ background: 'hsl(222 47% 5%)' }}>
+    <div className="relative min-h-screen" style={{ background: 'hsl(0 0% 4%)' }}>
       {/* Animated graph canvas — fixed, full-page background */}
       <GraphCanvas />
 

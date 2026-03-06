@@ -39,11 +39,11 @@ export function CTASection() {
       ref={sectionRef}
       className="relative py-32 px-6"
     >
-      {/* Strong glow backdrop for CTA */}
+      {/* Glow backdrop */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 60% 70% at 50% 50%, rgba(14,213,237,0.07) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse 60% 70% at 50% 50%, rgba(220,40,40,0.06) 0%, transparent 65%)',
         }}
       />
       <div className="gradient-line absolute top-0 left-0 right-0" />
@@ -54,16 +54,16 @@ export function CTASection() {
           <p className="section-label reveal">Early Access</p>
           <h2
             className="reveal font-display text-4xl lg:text-5xl font-bold leading-tight"
-            style={{ color: 'hsl(210 20% 95%)' }}
+            style={{ color: 'rgba(235,235,235,0.97)' }}
           >
             Get updates{' '}
-            <span className="text-glow" style={{ color: 'hsl(191 100% 60%)' }}>
+            <span className="text-glow" style={{ color: 'rgba(220,40,40,0.95)' }}>
               as we build.
             </span>
           </h2>
           <p
             className="reveal font-body text-lg leading-relaxed"
-            style={{ color: 'hsl(220 15% 55%)' }}
+            style={{ color: 'rgba(120,120,120,1)' }}
           >
             Early access, milestones, and launch announcements — delivered as Sapien Eleven comes to life.
           </p>
@@ -75,20 +75,20 @@ export function CTASection() {
             <div
               className="p-8 rounded text-center"
               style={{
-                background: 'rgba(14,213,237,0.05)',
-                border: '1px solid rgba(14,213,237,0.25)',
+                background: 'rgba(220,40,40,0.04)',
+                border: '1px solid rgba(220,40,40,0.2)',
               }}
             >
               <div className="flex items-center justify-center gap-3 mb-3">
                 <div className="node-dot" />
                 <p
                   className="font-display text-sm tracking-wider"
-                  style={{ color: 'hsl(191 100% 65%)', letterSpacing: '0.12em' }}
+                  style={{ color: 'rgba(220,80,80,0.9)', letterSpacing: '0.12em' }}
                 >
                   YOU ARE CONNECTED.
                 </p>
               </div>
-              <p className="font-body text-sm" style={{ color: 'hsl(220 15% 55%)' }}>
+              <p className="font-body text-sm" style={{ color: 'rgba(120,120,120,1)' }}>
                 We have your email. You will hear from us when it matters.
               </p>
             </div>
@@ -116,7 +116,7 @@ export function CTASection() {
           {!submitted && (
             <p
               className="mt-4 font-ui text-xs tracking-wider"
-              style={{ color: 'hsl(220 15% 38%)', letterSpacing: '0.12em' }}
+              style={{ color: 'rgba(90,90,90,1)', letterSpacing: '0.12em' }}
             >
               NO SPAM. EVER.
             </p>
@@ -127,9 +127,9 @@ export function CTASection() {
         <div className="reveal flex items-center justify-center gap-4 pt-4">
           <div className="gradient-line flex-1" />
           <div className="flex gap-2 items-center">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(14,213,237,0.3)' }} />
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(14,213,237,0.6)', boxShadow: '0 0 8px rgba(14,213,237,0.5)' }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(14,213,237,0.3)' }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(160,160,160,0.25)' }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'rgba(220,40,40,0.7)', boxShadow: '0 0 8px rgba(220,40,40,0.5)' }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(160,160,160,0.25)' }} />
           </div>
           <div className="gradient-line flex-1" />
         </div>

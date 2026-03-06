@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 
 const inputs = [
-  { label: 'Sleep', x: 60, y: 60, color: 'rgba(160,110,240,' },
-  { label: 'Nutrition', x: 60, y: 130, color: 'rgba(80,200,120,' },
-  { label: 'Workouts', x: 60, y: 200, color: 'rgba(255,140,60,' },
-  { label: 'Biometrics', x: 60, y: 270, color: 'rgba(14,213,237,' },
-  { label: 'Mood', x: 60, y: 340, color: 'rgba(255,180,100,' },
-  { label: 'Coach', x: 60, y: 410, color: 'rgba(14,213,237,' },
+  { label: 'Sleep', x: 60, y: 60, color: 'rgba(190,190,190,' },
+  { label: 'Nutrition', x: 60, y: 130, color: 'rgba(160,160,160,' },
+  { label: 'Workouts', x: 60, y: 200, color: 'rgba(220,40,40,' },
+  { label: 'Biometrics', x: 60, y: 270, color: 'rgba(200,200,200,' },
+  { label: 'Mood', x: 60, y: 340, color: 'rgba(160,160,160,' },
+  { label: 'Coach', x: 60, y: 410, color: 'rgba(220,40,40,' },
 ];
 
 const outputNodes = [
-  { label: 'Nutrition Plan', x: 440, y: 100, color: 'rgba(80,200,120,' },
-  { label: 'Workout Plan', x: 440, y: 190, color: 'rgba(255,140,60,' },
-  { label: 'Recovery', x: 440, y: 280, color: 'rgba(14,213,237,' },
-  { label: 'Mental Health', x: 440, y: 370, color: 'rgba(160,110,240,' },
+  { label: 'Nutrition Plan', x: 440, y: 100, color: 'rgba(200,200,200,' },
+  { label: 'Workout Plan', x: 440, y: 190, color: 'rgba(220,40,40,' },
+  { label: 'Recovery', x: 440, y: 280, color: 'rgba(180,180,180,' },
+  { label: 'Mental Health', x: 440, y: 370, color: 'rgba(160,160,160,' },
 ];
 
 const hubX = 250;
@@ -112,46 +112,46 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         })}
 
         {/* Hub outer rings */}
-        <circle cx={hubX} cy={hubY} r="50" stroke="rgba(14,213,237,0.08)" strokeWidth="0.6" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
-        <circle cx={hubX} cy={hubY} r="36" stroke="rgba(14,213,237,0.15)" strokeWidth="0.8" />
-        <circle cx={hubX} cy={hubY} r="28" fill="rgba(8,14,26,0.9)" stroke="rgba(14,213,237,0.5)" strokeWidth="1.5" style={{ filter: 'drop-shadow(0 0 16px rgba(14,213,237,0.4))' }} />
-        <circle cx={hubX} cy={hubY} r="8" fill="rgba(14,213,237,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
+        <circle cx={hubX} cy={hubY} r="50" stroke="rgba(160,160,160,0.06)" strokeWidth="0.6" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
+        <circle cx={hubX} cy={hubY} r="36" stroke="rgba(160,160,160,0.12)" strokeWidth="0.8" />
+        <circle cx={hubX} cy={hubY} r="28" fill="rgba(10,10,10,0.92)" stroke="rgba(220,40,40,0.55)" strokeWidth="1.5" style={{ filter: 'drop-shadow(0 0 16px rgba(220,40,40,0.35))' }} />
+        <circle cx={hubX} cy={hubY} r="8" fill="rgba(220,40,40,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
 
-        <text x={hubX} y={hubY - 36} textAnchor="middle" fill="rgba(14,213,237,0.6)" fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.8">AI + DATA LAYER</text>
-        <text x={hubX} y={hubY + 44} textAnchor="middle" fill="rgba(14,213,237,0.4)" fontSize="5.5" fontFamily="Orbitron, sans-serif" letterSpacing="0.5">SAPIEN ELEVEN</text>
+        <text x={hubX} y={hubY - 36} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.8">AI + DATA LAYER</text>
+        <text x={hubX} y={hubY + 44} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="5.5" fontFamily="Orbitron, sans-serif" letterSpacing="0.5">SAPIEN ELEVEN</text>
 
         {/* Input nodes */}
         {inputs.map((inp, i) => (
           <g key={`in-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.08}s` }}>
-            <rect x={inp.x - 28} y={inp.y - 12} width={56} height={22} rx="2" fill="rgba(8,14,26,0.8)" stroke={`${inp.color}0.3)`} strokeWidth="0.7" />
+            <rect x={inp.x - 28} y={inp.y - 12} width={56} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${inp.color}0.25)`} strokeWidth="0.7" />
             <circle cx={inp.x + 20} cy={inp.y} r="3.5" fill={`${inp.color}0.8)`} />
-            <text x={inp.x - 22} y={inp.y + 4} fill={`${inp.color}0.7)`} fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.5">{inp.label.toUpperCase()}</text>
+            <text x={inp.x - 22} y={inp.y + 4} fill={`${inp.color}0.65)`} fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.5">{inp.label.toUpperCase()}</text>
           </g>
         ))}
 
         {/* Output nodes */}
         {outputNodes.map((out, i) => (
           <g key={`out-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.1 + 0.3}s` }}>
-            <rect x={out.x - 18} y={out.y - 12} width={62} height={22} rx="2" fill="rgba(8,14,26,0.8)" stroke={`${out.color}0.3)`} strokeWidth="0.7" />
+            <rect x={out.x - 18} y={out.y - 12} width={62} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${out.color}0.25)`} strokeWidth="0.7" />
             <circle cx={out.x - 18} cy={out.y} r="3.5" fill={`${out.color}0.8)`} />
-            <text x={out.x - 12} y={out.y + 4} fill={`${out.color}0.7)`} fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.4">{out.label.toUpperCase()}</text>
+            <text x={out.x - 12} y={out.y + 4} fill={`${out.color}0.65)`} fontSize="6" fontFamily="Orbitron, sans-serif" letterSpacing="0.4">{out.label.toUpperCase()}</text>
           </g>
         ))}
 
         {/* Labels */}
-        <text x="36" y="20" fill="rgba(14,213,237,0.25)" fontSize="7" fontFamily="Orbitron, sans-serif" letterSpacing="1">INPUTS</text>
-        <text x="420" y="20" fill="rgba(14,213,237,0.25)" fontSize="7" fontFamily="Orbitron, sans-serif" letterSpacing="1">OUTPUTS</text>
+        <text x="36" y="20" fill="rgba(120,120,120,0.35)" fontSize="7" fontFamily="Orbitron, sans-serif" letterSpacing="1">INPUTS</text>
+        <text x="420" y="20" fill="rgba(120,120,120,0.35)" fontSize="7" fontFamily="Orbitron, sans-serif" letterSpacing="1">OUTPUTS</text>
       </svg>
 
       {/* Query ticker */}
       {visible && (
         <div
           className="absolute bottom-0 left-0 right-0 text-center py-2 px-4"
-          style={{ borderTop: '1px solid rgba(14,213,237,0.08)' }}
+          style={{ borderTop: '1px solid rgba(220,40,40,0.08)' }}
         >
           <p
             className="font-ui text-xs"
-            style={{ color: 'rgba(14,213,237,0.55)', letterSpacing: '0.1em', fontStyle: 'italic' }}
+            style={{ color: 'rgba(200,80,80,0.6)', letterSpacing: '0.1em', fontStyle: 'italic' }}
             key={activeQuery}
           >
             {queries[activeQuery].text}
@@ -200,7 +200,7 @@ export function DataLayerSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(14,213,237,0.05) 0%, transparent 65%)',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(220,40,40,0.04) 0%, transparent 65%)',
         }}
       />
 
@@ -210,17 +210,17 @@ export function DataLayerSection() {
           <p className="section-label">The Core Technology</p>
           <h2
             className="font-display text-3xl lg:text-5xl font-bold leading-tight"
-            style={{ color: 'hsl(210 20% 93%)' }}
+            style={{ color: 'rgba(225,225,225,0.92)' }}
           >
             The AI + Data Layer{' '}
             <br />
-            <span className="text-glow" style={{ color: 'hsl(191 100% 60%)' }}>
+            <span className="text-glow" style={{ color: 'rgba(220,40,40,0.95)' }}>
               connecting every signal.
             </span>
           </h2>
           <p
             className="font-body text-lg max-w-2xl mx-auto leading-relaxed"
-            style={{ color: 'hsl(220 15% 55%)' }}
+            style={{ color: 'rgba(120,120,120,1)' }}
           >
             Every data point flows into one unified system. The AI cross-references signals
             across domains to produce recommendations that reflect your complete health picture — not just one slice of it.
@@ -232,9 +232,9 @@ export function DataLayerSection() {
           <div
             className="relative rounded p-4 lg:p-8"
             style={{
-              background: 'rgba(8,14,26,0.7)',
-              border: '1px solid rgba(14,213,237,0.12)',
-              boxShadow: '0 0 60px rgba(14,213,237,0.04)',
+              background: 'rgba(10,10,10,0.75)',
+              border: '1px solid rgba(160,160,160,0.1)',
+              boxShadow: '0 0 60px rgba(220,40,40,0.03)',
             }}
           >
             <DataLayerDiagram visible={visible} />
@@ -250,26 +250,26 @@ export function DataLayerSection() {
                 key={i}
                 className="p-5 rounded"
                 style={{
-                  background: 'rgba(14,213,237,0.02)',
-                  border: '1px solid rgba(14,213,237,0.1)',
+                  background: 'rgba(220,40,40,0.03)',
+                  border: '1px solid rgba(160,160,160,0.08)',
                 }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <span
                     className="font-ui text-xs px-2 py-0.5 rounded"
-                    style={{ background: 'rgba(14,213,237,0.1)', color: 'hsl(191 100% 65%)', letterSpacing: '0.06em' }}
+                    style={{ background: 'rgba(220,40,40,0.08)', color: 'rgba(220,100,100,0.85)', letterSpacing: '0.06em' }}
                   >
                     {s.a}
                   </span>
-                  <span style={{ color: 'rgba(14,213,237,0.3)', fontSize: '10px' }}>→</span>
+                  <span style={{ color: 'rgba(160,160,160,0.3)', fontSize: '10px' }}>→</span>
                   <span
                     className="font-ui text-xs px-2 py-0.5 rounded"
-                    style={{ background: 'rgba(14,213,237,0.1)', color: 'hsl(191 100% 65%)', letterSpacing: '0.06em' }}
+                    style={{ background: 'rgba(160,160,160,0.06)', color: 'rgba(180,180,180,0.75)', letterSpacing: '0.06em' }}
                   >
                     {s.b}
                   </span>
                 </div>
-                <p className="font-ui text-sm" style={{ color: 'hsl(220 15% 55%)', fontStyle: 'italic' }}>
+                <p className="font-ui text-sm" style={{ color: 'rgba(110,110,110,1)', fontStyle: 'italic' }}>
                   "{s.c}"
                 </p>
               </div>
