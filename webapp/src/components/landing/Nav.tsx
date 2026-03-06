@@ -28,45 +28,12 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-8 h-8 flex items-center justify-center">
-              {/* 3D cube mark — matches favicon */}
-              <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 6px rgba(202,60,61,0.5))' }}>
-                <defs>
-                  <linearGradient id="navTopFace" x1="50" y1="12" x2="66" y2="48" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#CA3C3D"/>
-                    <stop offset="100%" stopColor="#A82F30"/>
-                  </linearGradient>
-                  <linearGradient id="navLeftFace" x1="34" y1="30" x2="34" y2="71" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#6B1A1A"/>
-                    <stop offset="100%" stopColor="#3A1010"/>
-                  </linearGradient>
-                  <linearGradient id="navRightFace" x1="66" y1="30" x2="66" y2="71" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#3A0E0E"/>
-                    <stop offset="100%" stopColor="#1A0606"/>
-                  </linearGradient>
-                  <linearGradient id="navShine" x1="30" y1="14" x2="55" y2="38" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28"/>
-                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
-                  </linearGradient>
-                  <radialGradient id="navBg" cx="50%" cy="50%" r="60%">
-                    <stop offset="0%" stopColor="#140303"/>
-                    <stop offset="100%" stopColor="#080808"/>
-                  </radialGradient>
-                </defs>
-                <rect width="100" height="100" fill="url(#navBg)" rx="18"/>
-                <polygon points="50,48 82,30 82,53 50,71" fill="url(#navRightFace)"/>
-                <polygon points="18,30 50,48 50,71 18,53" fill="url(#navLeftFace)"/>
-                <polygon points="50,12 82,30 50,48 18,30" fill="url(#navTopFace)"/>
-                <polygon points="50,12 82,30 50,48 18,30" fill="url(#navShine)"/>
-                <line x1="50" y1="12" x2="18" y2="30" stroke="#D94F50" strokeWidth="0.9" strokeOpacity="0.65" strokeLinecap="round"/>
-                <line x1="50" y1="12" x2="82" y2="30" stroke="#CA3C3D" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
-                <line x1="50" y1="48" x2="50" y2="71" stroke="#880808" strokeWidth="0.7" strokeOpacity="0.9" strokeLinecap="round"/>
-                <line x1="18" y1="30" x2="18" y2="53" stroke="#881010" strokeWidth="0.6" strokeOpacity="0.5" strokeLinecap="round"/>
-                <line x1="82" y1="30" x2="82" y2="53" stroke="#440404" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
-                <line x1="18" y1="53" x2="50" y2="71" stroke="#6B0808" strokeWidth="0.6" strokeOpacity="0.5" strokeLinecap="round"/>
-                <line x1="82" y1="53" x2="50" y2="71" stroke="#330303" strokeWidth="0.6" strokeOpacity="0.4" strokeLinecap="round"/>
-              </svg>
-            </div>
+            <img
+              src="/s-logo.png"
+              alt="Sapien Eleven"
+              className="w-9 h-9 object-contain"
+              style={{ filter: 'drop-shadow(0 0 6px rgba(202,60,61,0.5))' }}
+            />
             <div>
               <span
                 className="font-display text-sm font-700 tracking-widest"
