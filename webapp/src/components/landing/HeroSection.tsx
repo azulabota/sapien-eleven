@@ -384,13 +384,15 @@ export function HeroSection() {
                 style={{
                   display: 'inline-block',
                   fontWeight: 400,
-                  lineHeight: 0.92,
-                  fontSize: 'clamp(1.5rem, 4.1vw, 3.0rem)',
+                  lineHeight: 1.06,
+                  paddingTop: '0.08em',
+                  paddingBottom: '0.02em',
+                  fontSize: 'clamp(2.05rem, 5.3vw, 4.1rem)',
                 }}
               >
                 SAPIEN&nbsp;ELEVEN
               </span>
-              <span className="s11-platforms" style={{ display: 'block', fontSize: 'clamp(2.6rem, 7.8vw, 6rem)' }}>
+              <span className="s11-platforms" style={{ display: 'block', fontSize: 'clamp(2.08rem, 6.3vw, 4.8rem)' }}>
                 Platforms
               </span>
             </h1>
