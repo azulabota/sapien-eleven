@@ -27,32 +27,34 @@ export function Nav() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-9 h-9 flex items-center justify-center">
-              {/* Animated pulsing red glow behind logo */}
+          <a href="#" className="flex items-center gap-3 group" aria-label="Sapien Eleven Platforms">
+            <div className="relative flex items-center justify-center" style={{ width: 30, height: 30 }}>
+              {/* Subtle neutral glow (white/grey), no background circle */}
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(202,60,61,0.35) 0%, rgba(202,60,61,0) 70%)',
-                  animation: 'logo-glow-pulse 2.5s ease-in-out infinite',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%)',
                   transform: 'scale(1.8)',
                 }}
               />
               <img
-                src="/s-logo.png"
-                alt="Sapien Eleven"
-                className="w-9 h-9 object-contain relative"
+                src="/brand/icon-red.png"
+                alt=""
+                className="object-contain relative"
                 style={{
-                  mixBlendMode: 'lighten',
-                  filter: 'drop-shadow(0 0 10px rgba(255,0,41,0.55)) brightness(1.1)',
+                  width: 28,
+                  height: 28,
+                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.10)) drop-shadow(0 0 10px rgba(255,0,41,0.25))',
                 }}
               />
             </div>
-            <div className="leading-none">
-              <span className="font-brand s11-wordmark" style={{ fontSize: '0.85rem', display: 'inline-block', lineHeight: 0.92 }}>
-                SAPIEN&nbsp;ELEVEN
-              </span>
-            </div>
+
+            <img
+              src="/brand/wordmark-white.png"
+              alt="Sapien Eleven"
+              className="block"
+              style={{ height: 14, width: 'auto' }}
+            />
           </a>
 
           {/* CTA */}
