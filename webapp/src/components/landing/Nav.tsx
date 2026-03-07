@@ -44,22 +44,13 @@ export function Nav() {
                 className="w-9 h-9 object-contain relative"
                 style={{
                   mixBlendMode: 'lighten',
-                  filter: 'drop-shadow(0 0 8px rgba(202,60,61,0.6)) brightness(1.15)',
+                  filter: 'drop-shadow(0 0 10px rgba(255,0,41,0.55)) brightness(1.1)',
                 }}
               />
             </div>
-            <div>
-              <span
-                className="font-display text-sm font-700 tracking-widest"
-                style={{ color: '#CA3C3D', letterSpacing: '0.12em' }}
-              >
-                SAPIEN
-              </span>
-              <span
-                className="font-display text-sm font-400 tracking-widest ml-1"
-                style={{ color: 'rgba(200,200,200,0.7)', letterSpacing: '0.12em' }}
-              >
-                ELEVEN
+            <div className="leading-none">
+              <span className="font-brand s11-wordmark" style={{ fontSize: '0.95rem' }}>
+                SAPIEN ELEVEN
               </span>
             </div>
           </a>
