@@ -29,6 +29,7 @@ export function GraphCanvas() {
   const animRef = useRef<number>(0);
   const nodesRef = useRef<NodeData[]>([]);
   const edgesRef = useRef<EdgeData[]>([]);
+  const sectionsRef = useRef<Array<{ id: string; top: number; height: number }>>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,6 +42,18 @@ export function GraphCanvas() {
     let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     let worldH = Math.max(getViewport().h, document.documentElement.scrollHeight || 0);
 
+    const refreshSections = () => {
+      // Capture section top offsets for section-aware emphasis.
+      const sections = Array.from(document.querySelectorAll('section[id]')) as HTMLElement[];
+      sectionsRef.current = sections
+        .map((el) => {
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + (window.scrollY || 0);
+          return { id: el.id, top, height: rect.height };
+        })
+        .filter((s) => Number.isFinite(s.top) && s.height > 0);
+    };
+
     const resize = () => {
       dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
       const { w, h } = getViewport();
@@ -50,6 +63,7 @@ export function GraphCanvas() {
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       worldH = Math.max(h, document.documentElement.scrollHeight || 0);
+      refreshSections();
       initGraph();
     };
 
@@ -113,9 +127,33 @@ export function GraphCanvas() {
 
       ctx.clearRect(0, 0, vw, vh);
 
+      // Section-aware emphasis: gently brighten when a section is centered.
+      const centerY = scrollY + vh / 2;
+      const sections = sectionsRef.current;
+      let nearestDist = Infinity;
+      let nearestId = '';
+      for (const s of sections) {
+        const sCenter = s.top + s.height / 2;
+        const d = Math.abs(centerY - sCenter);
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearestId = s.id;
+        }
+      }
+
+      const sectionT = nearestDist === Infinity ? 0 : Math.max(0, 1 - nearestDist / (vh * 0.9));
+      const sectionEmphasis = sectionT * sectionT * (3 - 2 * sectionT); // smoothstep
+
+      const isKey = nearestId === 'hero' || nearestId === 'data-layer' || nearestId === 'cta';
+      const keyBoost = isKey ? 1 : 0;
+
+      // Mobile contrast bump.
+      const mobile = vw < 640;
+      const contrast = mobile ? 1.18 : 1;
+
       // Only draw what's in view (world-space nodes are spread across the full page height).
-      const viewTop = scrollY - 120;
-      const viewBottom = scrollY + vh + 120;
+      const viewTop = scrollY - 140;
+      const viewBottom = scrollY + vh + 140;
 
       for (const edge of edges) {
         const nA = nodes[edge.from];
@@ -133,11 +171,12 @@ export function GraphCanvas() {
         const dx = bx - ax;
         const dy = by - ay;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = Math.min(vw, 720) * 0.26;
+        const baseMaxDist = Math.min(vw, 720) * 0.26;
+        const maxDist = baseMaxDist * (1 + 0.18 * sectionEmphasis + 0.12 * keyBoost);
 
         const isRedEdge = nA.type === 'red' && nB.type === 'red';
         const col = isRedEdge ? RED : SILVER;
-        const alpha = (1 - dist / maxDist) * 0.085;
+        const alpha = (1 - dist / maxDist) * (0.075 + 0.03 * sectionEmphasis + 0.02 * keyBoost) * contrast;
 
         ctx.beginPath();
         ctx.moveTo(ax, ay);
@@ -151,17 +190,20 @@ export function GraphCanvas() {
         if (edge.travelTimer <= 0 && !edge.travelActive) {
           edge.travelActive = true;
           edge.travelProgress = 0;
-          edge.travelTimer = 180 + Math.random() * 380;
+          // More frequent packets when the current section is emphasized.
+          const base = 180 + Math.random() * 380;
+          const faster = base * (1 - 0.35 * sectionEmphasis - 0.2 * keyBoost);
+          edge.travelTimer = Math.max(60, faster);
         }
         if (edge.travelActive) {
           edge.travelProgress += edge.travelSpeed;
           const px = ax + dx * edge.travelProgress;
           const py = ay + dy * edge.travelProgress;
-          const packetAlpha = Math.sin(edge.travelProgress * Math.PI) * 0.85;
+          const packetAlpha = Math.sin(edge.travelProgress * Math.PI) * (0.65 + 0.25 * sectionEmphasis + 0.25 * keyBoost) * contrast;
           const packetCol = isRedEdge ? RED : SILVER;
 
           ctx.beginPath();
-          ctx.arc(px, py, 1.7, 0, Math.PI * 2);
+          ctx.arc(px, py, 1.8, 0, Math.PI * 2);
           ctx.fillStyle = `${packetCol} ${packetAlpha})`;
           ctx.fill();
 
@@ -199,9 +241,9 @@ export function GraphCanvas() {
         const sx = node.x;
         const sy = node.y - scrollY;
 
-        const glowRadius = node.radius * (3.0 + pulse * 1.9);
+        const glowRadius = node.radius * (3.0 + pulse * 1.9) * (1 + 0.08 * sectionEmphasis) * (mobile ? 1.12 : 1);
         const gradient = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowRadius);
-        gradient.addColorStop(0, `${col} ${alpha * 0.32})`);
+        gradient.addColorStop(0, `${col} ${alpha * (0.3 + 0.08 * sectionEmphasis + 0.06 * keyBoost)})`);
         gradient.addColorStop(1, `${col} 0)`);
         ctx.beginPath();
         ctx.arc(sx, sy, glowRadius, 0, Math.PI * 2);
@@ -220,9 +262,11 @@ export function GraphCanvas() {
     resize();
     draw();
     window.addEventListener('resize', resize);
+    window.addEventListener('scroll', refreshSections, { passive: true });
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll', refreshSections);
     };
   }, []);
 
