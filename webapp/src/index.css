@@ -124,11 +124,12 @@
 
   /* Wordmark gradient: skewed strongly towards red; never reaches black. */
   .s11-wordmark {
-    background: linear-gradient(90deg, #ff0029 0%, #ff0029 55%, #c40022 100%);
+    /* Match site red (uses the existing primary red color) */
+    background: linear-gradient(90deg, rgba(202,60,61,1) 0%, rgba(202,60,61,1) 70%, rgba(202,60,61,0.92) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 18px rgba(255, 0, 41, 0.18);
+    text-shadow: 0 0 18px rgba(202, 60, 61, 0.22);
     letter-spacing: 0.04em;
     white-space: nowrap;
   }

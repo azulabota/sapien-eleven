@@ -362,7 +362,7 @@ export function HeroSection() {
       id="hero"
       ref={sectionRef}
       className="relative min-h-screen flex items-center"
-      style={{ paddingTop: '7rem', paddingBottom: '5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
+      style={{ paddingTop: '5.6rem', paddingBottom: '4.2rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
     >
       {/* Subtle red glow backdrop */}
       <div
@@ -385,10 +385,10 @@ export function HeroSection() {
                   display: 'inline-block',
                   fontWeight: 400,
                   lineHeight: 0.92,
-                  fontSize: 'clamp(2.2rem, 6.2vw, 4.6rem)',
+                  fontSize: 'clamp(1.5rem, 4.1vw, 3.0rem)',
                 }}
               >
-                SAPIEN A0ELEVEN
+                SAPIEN&nbsp;ELEVEN
               </span>
               <span className="s11-platforms" style={{ display: 'block', fontSize: 'clamp(2.6rem, 7.8vw, 6rem)' }}>
                 Platforms
