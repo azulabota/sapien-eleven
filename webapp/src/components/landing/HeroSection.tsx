@@ -27,17 +27,43 @@ function DataSphereAnimation() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const SIZE = 400;
-    const DPR = window.devicePixelRatio || 1;
-    canvas.width = SIZE * DPR;
-    canvas.height = SIZE * DPR;
-    ctx.scale(DPR, DPR);
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    let size = 400;
 
-    const cx = SIZE / 2;
-    const cy = SIZE / 2;
-    const sphereRadius = 140;
-    const perspective = 600;
-    const nodeCount = 120;
+    const computeSize = () => {
+      const parent = canvas.parentElement;
+      const rect = parent?.getBoundingClientRect();
+      // Slightly bigger, still subtle. Scale with container, clamp for sanity.
+      const target = rect?.width ? rect.width : 400;
+      size = Math.max(320, Math.min(520, target));
+      canvas.width = Math.floor(size * dpr);
+      canvas.height = Math.floor(size * dpr);
+      canvas.style.width = `${size}px`;
+      canvas.style.height = `${size}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const ro = new ResizeObserver(() => {
+      computeSize();
+      ;({ cx, cy, sphereRadius } = getGeom());
+      nodeCount = size >= 480 ? 150 : 120;
+    });
+    if (canvas.parentElement) ro.observe(canvas.parentElement);
+    computeSize();
+    ;({ cx, cy, sphereRadius } = getGeom());
+    nodeCount = size >= 480 ? 150 : 120;
+
+    const getGeom = () => {
+      const cx = size / 2;
+      const cy = size / 2;
+      const sphereRadius = size * 0.34;
+      return { cx, cy, sphereRadius };
+    };
+
+    let { cx, cy, sphereRadius } = getGeom();
+
+    const perspective = 650;
+    let nodeCount = size >= 480 ? 150 : 120;
     const connectionDist = 0.7; // max distance ratio for connections
 
     // Generate fibonacci sphere points
@@ -128,7 +154,7 @@ function DataSphereAnimation() {
     }
 
     const draw = () => {
-      ctx.clearRect(0, 0, SIZE, SIZE);
+      ctx.clearRect(0, 0, size, size);
       time += 0.016;
       rotY += 0.003;
       rotX = 0.3 + Math.sin(time * 0.2) * 0.1; // gentle wobble
@@ -311,11 +337,11 @@ function DataSphereAnimation() {
   }, []);
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 400, height: 400 }}>
-      <canvas
-        ref={canvasRef}
-        style={{ width: 400, height: 400, pointerEvents: 'none' }}
-      />
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: 'min(520px, 92vw)', aspectRatio: '1 / 1' }}
+    >
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
     </div>
   );
 }
@@ -353,9 +379,28 @@ export function HeroSection() {
         <div className="space-y-8">
           {/* Main title */}
           <div className="space-y-2">
-            <h1 className="hero-reveal font-display font-black leading-none" style={{ fontSize: 'clamp(3.5rem, 9vw, 7rem)' }}>
-              <span style={{ color: '#CA3C3D', display: 'block' }}>SAPIEN ELEVEN</span>
-              <span style={{ color: 'rgba(245,245,245,0.95)', display: 'block', fontWeight: 300, fontSize: 'clamp(2.8rem, 7vw, 5.6rem)' }}>Platforms</span>
+            <h1 className="hero-reveal font-display leading-none" style={{ fontSize: 'clamp(3.3rem, 9vw, 7rem)' }}>
+              <span
+                style={{
+                  color: '#CA3C3D',
+                  display: 'block',
+                  fontWeight: 900,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                SAPIEN ELEVEN
+              </span>
+              <span
+                style={{
+                  color: 'rgba(245,245,245,0.92)',
+                  display: 'block',
+                  fontWeight: 300,
+                  fontSize: 'clamp(2.6rem, 7vw, 5.4rem)',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Platforms
+              </span>
             </h1>
           </div>
 
