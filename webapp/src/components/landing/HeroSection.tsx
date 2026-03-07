@@ -43,16 +43,6 @@ function DataSphereAnimation() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    const ro = new ResizeObserver(() => {
-      computeSize();
-      ;({ cx, cy, sphereRadius } = getGeom());
-      nodeCount = size >= 480 ? 150 : 120;
-    });
-    if (canvas.parentElement) ro.observe(canvas.parentElement);
-    computeSize();
-    ;({ cx, cy, sphereRadius } = getGeom());
-    nodeCount = size >= 480 ? 150 : 120;
-
     const getGeom = () => {
       const cx = size / 2;
       const cy = size / 2;
@@ -60,11 +50,20 @@ function DataSphereAnimation() {
       return { cx, cy, sphereRadius };
     };
 
+    // Initial geometry
+    computeSize();
     let { cx, cy, sphereRadius } = getGeom();
 
     const perspective = 650;
     let nodeCount = size >= 480 ? 150 : 120;
     const connectionDist = 0.7; // max distance ratio for connections
+
+    const ro = new ResizeObserver(() => {
+      computeSize();
+      ;({ cx, cy, sphereRadius } = getGeom());
+      nodeCount = size >= 480 ? 150 : 120;
+    });
+    if (canvas.parentElement) ro.observe(canvas.parentElement);
 
     // Generate fibonacci sphere points
     const nodes: SphereNode[] = [];
