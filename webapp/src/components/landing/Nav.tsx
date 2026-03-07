@@ -50,7 +50,7 @@ export function Nav() {
             </div>
 
             <img
-              src="/brand/wordmark-white.png"
+              src="/brand/wordmark-white.svg"
               alt="Sapien Eleven"
               className="hidden sm:block"
               style={{ height: 14, width: 'auto' }}
