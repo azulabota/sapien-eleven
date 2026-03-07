@@ -52,7 +52,7 @@ export function Nav() {
             <img
               src="/brand/wordmark-white.png"
               alt="Sapien Eleven"
-              className="block"
+              className="hidden sm:block"
               style={{ height: 14, width: 'auto' }}
             />
           </a>
