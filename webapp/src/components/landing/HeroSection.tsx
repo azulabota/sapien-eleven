@@ -378,11 +378,19 @@ export function HeroSection() {
         <div className="space-y-8">
           {/* Main title */}
           <div className="space-y-2">
-            <h1 className="hero-reveal leading-none" style={{ fontSize: 'clamp(3.2rem, 9vw, 7rem)' }}>
-              <span className="font-brand s11-wordmark" style={{ display: 'inline-block', fontWeight: 400, lineHeight: 0.92 }}>
+            <h1 className="hero-reveal leading-none">
+              <span
+                className="font-brand s11-wordmark"
+                style={{
+                  display: 'inline-block',
+                  fontWeight: 400,
+                  lineHeight: 0.92,
+                  fontSize: 'clamp(2.2rem, 6.2vw, 4.6rem)',
+                }}
+              >
                 SAPIEN A0ELEVEN
               </span>
-              <span className="s11-platforms" style={{ display: 'block', fontSize: 'clamp(2.5rem, 7vw, 5.4rem)' }}>
+              <span className="s11-platforms" style={{ display: 'block', fontSize: 'clamp(2.6rem, 7.8vw, 6rem)' }}>
                 Platforms
               </span>
             </h1>
