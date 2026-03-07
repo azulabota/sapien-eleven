@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { WordmarkSvg } from './WordmarkSvg';
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -49,12 +50,7 @@ export function Nav() {
               />
             </div>
 
-            <img
-              src="/brand/wordmark-white.svg"
-              alt="Sapien Eleven"
-              className="hidden sm:block"
-              style={{ height: 14, width: 'auto' }}
-            />
+            <WordmarkSvg className="hidden sm:block" height={14} />
           </a>
 
           {/* CTA */}
