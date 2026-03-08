@@ -31,6 +31,8 @@ export function Nav() {
     let rx = 0;
     let ry = 0;
 
+    const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+
     const onMove = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
@@ -38,9 +40,9 @@ export function Nav() {
       const dx = (e.clientX - cx) / Math.max(1, rect.width);
       const dy = (e.clientY - cy) / Math.max(1, rect.height);
 
-      // Premium subtle: small degrees only
-      targetRy = dx * 12;
-      targetRx = -dy * 10;
+      // Limited degrees: left/right + slight downward tilt only
+      targetRy = clamp(dx * 10, -10, 10);
+      targetRx = clamp(dy * 8, 0, 8);
     };
 
     const onLeave = () => {
@@ -49,24 +51,19 @@ export function Nav() {
     };
 
     const tick = () => {
-      rx += (targetRx - rx) * 0.08;
-      ry += (targetRy - ry) * 0.08;
+      rx += (targetRx - rx) * 0.10;
+      ry += (targetRy - ry) * 0.10;
 
-      // tiny idle drift so it never looks dead
-      const t = performance.now() / 1000;
-      const idleY = Math.sin(t * 0.6) * 2.5;
-      const idleX = Math.cos(t * 0.5) * 1.5;
-
-      el.style.transform = `perspective(800px) rotateX(${rx + idleX}deg) rotateY(${ry + idleY}deg)`;
+      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
       raf = requestAnimationFrame(tick);
     };
 
-    window.addEventListener('pointermove', onMove, { passive: true });
+    el.addEventListener('pointermove', onMove, { passive: true } as any);
     el.addEventListener('pointerleave', onLeave);
     raf = requestAnimationFrame(tick);
 
     return () => {
-      window.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointermove', onMove as any);
       el.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(raf);
     };
