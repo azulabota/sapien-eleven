@@ -48,7 +48,8 @@ function BrokenGraphCanvas() {
     // Wearables in the center, other domains around it.
     const center = { cx: width * 0.5, cy: height * 0.5 };
     const ring = {
-      r: Math.min(width, height) * 0.28,
+      // Spread clusters out a bit more so they don't feel cramped.
+      r: Math.min(width, height) * 0.34,
       cx: center.cx,
       cy: center.cy,
     };
