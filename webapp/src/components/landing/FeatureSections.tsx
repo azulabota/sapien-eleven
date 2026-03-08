@@ -656,39 +656,56 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         const labels = getSpotlightLabels(feature.id);
         if (labels.length) {
           const pad = 34;
-          const spots = [
-            { x: pad, y: pad },
-            { x: W - pad, y: pad },
-            { x: W - pad, y: H - pad },
+          const cornerSpots = [
+            { x: pad, y: pad, align: 'left' as const },
+            { x: W - pad, y: pad, align: 'right' as const },
+            { x: W - pad, y: H - pad, align: 'right' as const },
           ];
 
-          const radius = 105;
+          const radius = 115;
           ctx.font = '700 10px Plus Jakarta Sans, sans-serif';
           ctx.textBaseline = 'middle';
 
-          for (let i = 0; i < Math.min(labels.length, spots.length); i++) {
-            const s = spots[i];
-            const dx = mouse.x - s.x;
-            const dy = mouse.y - s.y;
+          for (let i = 0; i < Math.min(labels.length, cornerSpots.length); i++) {
+            const base = cornerSpots[i];
+
+            // Float the label gently inside its corner pocket.
+            // Deterministic per label via phase offsets.
+            const phaseA = i * 1.7 + (feature.id.length % 7) * 0.6;
+            const phaseB = i * 2.3 + (feature.id.length % 5) * 0.8;
+            const floatX = Math.cos(t * 0.55 + phaseA) * 12 + Math.sin(t * 0.23 + phaseB) * 6;
+            const floatY = Math.sin(t * 0.48 + phaseA) * 10 + Math.cos(t * 0.19 + phaseB) * 5;
+
+            const sx = base.x + floatX;
+            const sy = base.y + floatY;
+
+            const dx = mouse.x - sx;
+            const dy = mouse.y - sy;
             const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist > radius) continue;
 
             const tSpot = 1 - dist / radius;
-            const alpha = (0.05 + 0.45 * tSpot * tSpot) * 0.9;
+            const alpha = (0.04 + 0.42 * tSpot * tSpot) * 0.95;
 
-            // soft glow behind text
-            const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 44);
-            glow.addColorStop(0, `${col}${alpha * 0.22})`);
-            glow.addColorStop(1, `${col}0)`);
+            // Subtle shadow-grey glow behind text (less “neon”, more premium).
+            const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 46);
+            glow.addColorStop(0, `rgba(140,140,140,${alpha * 0.16})`);
+            glow.addColorStop(1, 'rgba(140,140,140,0)');
             ctx.fillStyle = glow;
             ctx.beginPath();
-            ctx.arc(s.x, s.y, 44, 0, Math.PI * 2);
+            ctx.arc(sx, sy, 46, 0, Math.PI * 2);
             ctx.fill();
 
-            // text itself
-            ctx.fillStyle = `rgba(220,220,220,${alpha})`;
-            ctx.textAlign = i === 0 ? 'left' : 'right';
-            ctx.fillText(labels[i], s.x, s.y);
+            // text itself (shadowing grey)
+            ctx.save();
+            ctx.shadowColor = `rgba(0,0,0,${Math.min(0.55, 0.25 + alpha * 0.5)})`;
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 1;
+            ctx.fillStyle = `rgba(170,170,170,${alpha})`;
+            ctx.textAlign = base.align;
+            ctx.fillText(labels[i], sx, sy);
+            ctx.restore();
           }
         }
       }
