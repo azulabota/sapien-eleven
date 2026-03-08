@@ -127,33 +127,36 @@ function DataSphereAnimation() {
     let rotX = 0.3; // slight tilt
     let time = 0;
 
-    // Hover + tilt interaction
+    // Hover interaction (no tilt): attract data pulses toward cursor
     let hovering = false;
-    let targetTiltX = 0;
-    let targetTiltY = 0;
-    let tiltX = 0;
-    let tiltY = 0;
+    const cursor = { x: cx, y: cy };
+
+    type CursorPulse = {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+      isRed: boolean;
+      size: number;
+    };
+
+    const cursorPulses: CursorPulse[] = [];
 
     const onEnter = () => {
       hovering = true;
     };
     const onLeave = () => {
       hovering = false;
-      targetTiltX = 0;
-      targetTiltY = 0;
     };
     const onMove = (e: PointerEvent) => {
       const wrap = wrapperRef.current;
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
-      const cx0 = rect.left + rect.width / 2;
-      const cy0 = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx0) / Math.max(1, rect.width);
-      const dy = (e.clientY - cy0) / Math.max(1, rect.height);
-
-      // Keep it subtle.
-      targetTiltY = dx * 0.18;
-      targetTiltX = -dy * 0.16;
+      const x = (e.clientX - rect.left) / Math.max(1, rect.width);
+      const y = (e.clientY - rect.top) / Math.max(1, rect.height);
+      cursor.x = x * size;
+      cursor.y = y * size;
     };
 
     const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
@@ -197,17 +200,8 @@ function DataSphereAnimation() {
 
       // Base rotation (slow by ~30%)
       rotY += 0.0021;
-
-      // Hover focus: slow further + slightly stabilize wobble
-      const hoverK = hovering ? 0.55 : 1;
-
-      // Smooth tilt towards cursor (hover only)
-      tiltX += (targetTiltX - tiltX) * 0.08;
-      tiltY += (targetTiltY - tiltY) * 0.08;
-
-      rotX = (0.3 + Math.sin(time * 0.2) * 0.1 * hoverK) + tiltX;
-      const extraY = tiltY;
-      const rotYNow = rotY * (hovering ? 0.7 : 1) + extraY;
+      rotX = 0.3 + Math.sin(time * 0.2) * 0.1; // gentle wobble
+      const rotYNow = rotY;
 
       // Outer glow ring
       const ringGlow = ctx.createRadialGradient(cx, cy, sphereRadius * 0.95, cx, cy, sphereRadius * 1.35);
@@ -248,7 +242,6 @@ function DataSphereAnimation() {
         projMap.set(p.idx, p);
       }
 
-      const focusBoost = hovering ? 1.22 : 1;
 
       // Draw connections (lines between nearby nodes)
       for (const [i, j] of connections) {
@@ -259,7 +252,7 @@ function DataSphereAnimation() {
         // Fade based on average depth (back nodes are more transparent)
         const avgDepth = (pA.depth + pB.depth) / 2;
         const depthFactor = (avgDepth + 1) / 2; // 0 (back) to 1 (front)
-        const alpha = (0.03 + depthFactor * 0.08) * focusBoost;
+        const alpha = 0.03 + depthFactor * 0.08;
 
         const nodeA = nodes[i];
         const nodeB = nodes[j];
@@ -294,7 +287,7 @@ function DataSphereAnimation() {
         const py = pFrom.py + (pTo.py - pFrom.py) * pulse.progress;
         const avgDepth = (pFrom.depth + pTo.depth) / 2;
         const depthFactor = (avgDepth + 1) / 2;
-        const pulseAlpha = (0.3 + depthFactor * 0.5) * (hovering ? 1.12 : 1);
+        const pulseAlpha = 0.3 + depthFactor * 0.5;
         const pulseSize = 1.5 + depthFactor * 1.5;
 
         // Pulse glow
@@ -319,9 +312,69 @@ function DataSphereAnimation() {
         ctx.fill();
       }
 
-      // Spawn new pulses periodically (a touch more when hovering)
-      if (Math.random() < (hovering ? 0.055 : 0.04)) {
+      // Spawn new pulses periodically
+      if (Math.random() < 0.04) {
         spawnPulse();
+      }
+
+      // Cursor attraction effect: when hovering, spawn small pulses that flow toward the cursor.
+      if (hovering) {
+        // Spawn rate tuned to feel alive but not noisy.
+        if (cursorPulses.length < 42 && Math.random() < 0.35) {
+          // Start from a random projected node (so it feels connected to the graph)
+          const src = projected[Math.floor(Math.random() * projected.length)];
+          cursorPulses.push({
+            x: src.px,
+            y: src.py,
+            vx: 0,
+            vy: 0,
+            life: 1,
+            isRed: Math.random() < 0.55,
+            size: 1.4 + Math.random() * 1.4,
+          });
+        }
+
+        for (let i = cursorPulses.length - 1; i >= 0; i--) {
+          const cp = cursorPulses[i];
+          const dx = cursor.x - cp.x;
+          const dy = cursor.y - cp.y;
+          const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+
+          // Accelerate toward cursor with gentle damping
+          const ax = (dx / dist) * 0.35;
+          const ay = (dy / dist) * 0.35;
+          cp.vx = (cp.vx + ax) * 0.92;
+          cp.vy = (cp.vy + ay) * 0.92;
+          cp.x += cp.vx;
+          cp.y += cp.vy;
+
+          // Fade out as it approaches cursor
+          const near = Math.max(0, 1 - dist / (sphereRadius * 1.2));
+          cp.life -= 0.014 + near * 0.03;
+
+          const a = Math.max(0, Math.min(1, cp.life));
+          const col = cp.isRed ? '202,60,61' : '220,220,220';
+
+          // Glow
+          const g = ctx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 5);
+          g.addColorStop(0, `rgba(${col},${0.22 * a})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath();
+          ctx.arc(cp.x, cp.y, cp.size * 5, 0, Math.PI * 2);
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          // Core
+          ctx.beginPath();
+          ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${col},${0.75 * a})`;
+          ctx.fill();
+
+          if (cp.life <= 0) cursorPulses.splice(i, 1);
+        }
+      } else {
+        // Clear quickly when not hovering
+        cursorPulses.length = 0;
       }
 
       // Draw nodes (sorted back to front for proper layering)
