@@ -544,7 +544,7 @@ export function HeroSection() {
             style={{ borderTop: '1px solid rgba(160,160,160,0.08)' }}
           >
             {[
-              { value: '6+', label: 'Data Sources' },
+              { value: '∞', label: 'Data Sources' },
               { value: '4', label: 'AI Domains' },
               { value: '1', label: 'Unified Layer' },
             ].map((s) => (
