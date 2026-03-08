@@ -124,14 +124,17 @@
 
   /* Wordmark gradient: skewed strongly towards red; never reaches black. */
   .s11-wordmark {
-    /* Wordmark gradient: red → near-black (fade) */
-    background: linear-gradient(90deg, rgba(202,60,61,1) 0%, rgba(202,60,61,1) 58%, rgba(0,0,0,0.35) 100%);
+    /* Crisp wordmark gradient: red → deep red (avoid transparent/black fade that can look blurry) */
+    background: linear-gradient(90deg, rgba(202,60,61,1) 0%, rgba(202,60,61,1) 62%, rgba(120,20,26,1) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 18px rgba(202, 60, 61, 0.20);
+    /* Keep shadows minimal; heavy glow makes edges look fuzzy */
+    text-shadow: 0 0 10px rgba(202, 60, 61, 0.10);
     letter-spacing: 0.04em;
     white-space: nowrap;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .s11-platforms {
