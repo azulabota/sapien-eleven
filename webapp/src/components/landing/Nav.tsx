@@ -29,7 +29,7 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group" aria-label="Sapien Eleven Platforms">
-            <div className="relative flex items-center justify-center" style={{ width: 34, height: 34 }}>
+            <div className="relative flex items-center justify-center" style={{ width: 38, height: 38 }}>
               {/* Subtle neutral glow (white/grey), no background circle */}
               <div
                 className="absolute inset-0 rounded-full"
@@ -43,14 +43,14 @@ export function Nav() {
                 alt=""
                 className="object-contain relative"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 36,
+                  height: 36,
                   filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.10)) drop-shadow(0 0 10px rgba(255,0,41,0.25))',
                 }}
               />
             </div>
 
-            <WordmarkSvg className="hidden sm:block" height={14} />
+            <WordmarkSvg className="hidden sm:block" height={15} />
           </a>
 
           {/* CTA */}
