@@ -6,10 +6,11 @@ import { FeatureSections } from '@/components/landing/FeatureSections';
 import { DataLayerSection } from '@/components/landing/DataLayerSection';
 import { CTASection } from '@/components/landing/CTASection';
 import { Footer } from '@/components/landing/Footer';
+import { BottomBar } from '@/components/landing/BottomBar';
 
 export default function Index() {
   return (
-    <div className="relative min-h-screen" style={{ background: 'hsl(0 0% 4%)' }}>
+    <div className="relative min-h-screen" style={{ background: 'hsl(0 0% 4%)', paddingBottom: 72 }}>
       {/* Animated graph canvas — fixed, full-page background */}
       <GraphCanvas />
 
@@ -23,6 +24,8 @@ export default function Index() {
         <CTASection />
         <Footer />
       </div>
+
+      <BottomBar />
     </div>
   );
 }
