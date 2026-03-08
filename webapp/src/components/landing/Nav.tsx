@@ -28,59 +28,52 @@ export function Nav() {
     let raf = 0;
     let targetRx = 0;
     let targetRy = 0;
-    let targetTx = 0;
-    let targetTy = 0;
 
     let rx = 0;
     let ry = 0;
-    let tx = 0;
-    let ty = 0;
 
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
     const onMove = (e: PointerEvent) => {
+      // Keep the icon fixed in place; just rotate to “face” the cursor.
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / Math.max(1, rect.width);
-      const dy = (e.clientY - cy) / Math.max(1, rect.height);
 
-      // Make the motion obvious: ~30% travel left/right, ~30% travel downward
-      // (mapped from cursor position across the icon)
-      targetTx = clamp(dx, -0.5, 0.5) * rect.width * 0.6; // 0.5 → 0.3w
-      targetTy = clamp(dy, 0, 0.5) * rect.height * 0.6; // 0.5 → 0.3h (down only)
+      // Normalize cursor offset from the logo center to a [-1..1] range.
+      // (Using viewport units makes it respond even if the cursor isn't directly over the icon.)
+      const dx = (e.clientX - cx) / Math.max(1, window.innerWidth * 0.5);
+      const dy = (e.clientY - cy) / Math.max(1, window.innerHeight * 0.5);
 
-      // Keep a little tilt so it feels “3D”, but don’t let it spin wildly
-      targetRy = clamp(dx * 14, -14, 14);
-      targetRx = clamp(dy * 10, 0, 10);
+      // “Up to 30% tilt” → interpret as up to ~30deg max rotation.
+      targetRy = clamp(dx * 30, -30, 30);
+      // Slight vertical tilt to enhance the facing effect (cap it so it doesn't look like it's flipping)
+      targetRx = clamp(dy * 18, -18, 18);
     };
 
     const onLeave = () => {
       targetRx = 0;
       targetRy = 0;
-      targetTx = 0;
-      targetTy = 0;
     };
 
     const tick = () => {
-      // Smooth follow (increase slightly so it feels responsive)
-      const follow = 0.14;
+      // Smooth follow (responsive but not twitchy)
+      const follow = 0.12;
       rx += (targetRx - rx) * follow;
       ry += (targetRy - ry) * follow;
-      tx += (targetTx - tx) * follow;
-      ty += (targetTy - ty) * follow;
 
-      el.style.transform = `translate3d(${tx}px, ${ty}px, 0) perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
       raf = requestAnimationFrame(tick);
     };
 
-    el.addEventListener('pointermove', onMove, { passive: true } as any);
-    el.addEventListener('pointerleave', onLeave);
+    // Listen on window so it reacts as the user moves anywhere on screen.
+    window.addEventListener('pointermove', onMove, { passive: true } as any);
+    window.addEventListener('pointerleave', onLeave);
     raf = requestAnimationFrame(tick);
 
     return () => {
-      el.removeEventListener('pointermove', onMove as any);
-      el.removeEventListener('pointerleave', onLeave);
+      window.removeEventListener('pointermove', onMove as any);
+      window.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(raf);
     };
   }, []);
