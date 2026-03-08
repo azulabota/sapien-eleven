@@ -28,8 +28,13 @@ export function Nav() {
     let raf = 0;
     let targetRx = 0;
     let targetRy = 0;
+    let targetTx = 0;
+    let targetTy = 0;
+
     let rx = 0;
     let ry = 0;
+    let tx = 0;
+    let ty = 0;
 
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
@@ -40,21 +45,32 @@ export function Nav() {
       const dx = (e.clientX - cx) / Math.max(1, rect.width);
       const dy = (e.clientY - cy) / Math.max(1, rect.height);
 
-      // Limited degrees: left/right + slight downward tilt only
-      targetRy = clamp(dx * 10, -10, 10);
-      targetRx = clamp(dy * 8, 0, 8);
+      // Make the motion obvious: ~30% travel left/right, ~30% travel downward
+      // (mapped from cursor position across the icon)
+      targetTx = clamp(dx, -0.5, 0.5) * rect.width * 0.6; // 0.5 → 0.3w
+      targetTy = clamp(dy, 0, 0.5) * rect.height * 0.6; // 0.5 → 0.3h (down only)
+
+      // Keep a little tilt so it feels “3D”, but don’t let it spin wildly
+      targetRy = clamp(dx * 14, -14, 14);
+      targetRx = clamp(dy * 10, 0, 10);
     };
 
     const onLeave = () => {
       targetRx = 0;
       targetRy = 0;
+      targetTx = 0;
+      targetTy = 0;
     };
 
     const tick = () => {
-      rx += (targetRx - rx) * 0.10;
-      ry += (targetRy - ry) * 0.10;
+      // Smooth follow (increase slightly so it feels responsive)
+      const follow = 0.14;
+      rx += (targetRx - rx) * follow;
+      ry += (targetRy - ry) * follow;
+      tx += (targetTx - tx) * follow;
+      ty += (targetTy - ty) * follow;
 
-      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      el.style.transform = `translate3d(${tx}px, ${ty}px, 0) perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
       raf = requestAnimationFrame(tick);
     };
 
