@@ -34,8 +34,8 @@ export function Nav() {
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 70%)',
-                  transform: 'scale(1.55)',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)',
+                  transform: 'scale(1.15)',
                 }}
               />
               <img
