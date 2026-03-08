@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WordmarkSvg } from './WordmarkSvg';
 
 export function Nav() {
+  const logoRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    reduceMotion.current = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  }, []);
+
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -9,6 +17,59 @@ export function Nav() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const el = logoRef.current;
+    if (!el) return;
+
+    if (reduceMotion.current) return;
+
+    let raf = 0;
+    let targetRx = 0;
+    let targetRy = 0;
+    let rx = 0;
+    let ry = 0;
+
+    const onMove = (e: PointerEvent) => {
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / Math.max(1, rect.width);
+      const dy = (e.clientY - cy) / Math.max(1, rect.height);
+
+      // Premium subtle: small degrees only
+      targetRy = dx * 12;
+      targetRx = -dy * 10;
+    };
+
+    const onLeave = () => {
+      targetRx = 0;
+      targetRy = 0;
+    };
+
+    const tick = () => {
+      rx += (targetRx - rx) * 0.08;
+      ry += (targetRy - ry) * 0.08;
+
+      // tiny idle drift so it never looks dead
+      const t = performance.now() / 1000;
+      const idleY = Math.sin(t * 0.6) * 2.5;
+      const idleX = Math.cos(t * 0.5) * 1.5;
+
+      el.style.transform = `perspective(800px) rotateX(${rx + idleX}deg) rotateY(${ry + idleY}deg)`;
+      raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    el.addEventListener('pointerleave', onLeave);
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerleave', onLeave);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const handleCTA = () => {
@@ -29,7 +90,11 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group" aria-label="Sapien Eleven Platforms">
-            <div className="relative flex items-center justify-center" style={{ width: 52, height: 52 }}>
+            <div
+              ref={logoRef}
+              className="relative flex items-center justify-center s11-logoMotion"
+              style={{ width: 52, height: 52, willChange: 'transform' }}
+            >
               {/* Subtle neutral glow (white/grey), no background circle */}
               <div
                 className="absolute inset-0 rounded-full"

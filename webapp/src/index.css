@@ -363,6 +363,24 @@
   animation: spin-slow 20s linear infinite;
 }
 
+@keyframes logo-rotate-y {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+/* Premium-ish logo motion (disable if user prefers reduced motion) */
+.s11-logoMotion {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s11-logoMotion {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 /* Scroll reveal */
 .reveal {
   opacity: 0;
