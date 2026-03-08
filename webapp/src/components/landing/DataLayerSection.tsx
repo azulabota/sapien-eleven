@@ -2,18 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 const inputs = [
   { label: 'Sleep', x: 60, y: 60, color: 'rgba(190,190,190,' },
-  { label: 'Nutrition', x: 60, y: 130, color: 'rgba(160,160,160,' },
-  { label: 'Workouts', x: 60, y: 200, color: 'rgba(202,60,61,' },
-  { label: 'Biometrics', x: 60, y: 270, color: 'rgba(200,200,200,' },
-  { label: 'Mood', x: 60, y: 340, color: 'rgba(160,160,160,' },
-  { label: 'Coach', x: 60, y: 410, color: 'rgba(202,60,61,' },
+  { label: 'Meal Plan', x: 60, y: 130, color: 'rgba(160,160,160,' },
+  { label: 'Workout', x: 60, y: 200, color: 'rgba(202,60,61,' },
+  { label: 'Vitals', x: 60, y: 270, color: 'rgba(200,200,200,' },
+  { label: 'Coaching', x: 60, y: 340, color: 'rgba(160,160,160,' },
+  { label: 'Mood', x: 60, y: 410, color: 'rgba(202,60,61,' },
 ];
 
 const outputNodes = [
   { label: 'Nutrition Plan', x: 440, y: 100, color: 'rgba(200,200,200,' },
   { label: 'Workout Plan', x: 440, y: 190, color: 'rgba(202,60,61,' },
-  { label: 'Recovery', x: 440, y: 280, color: 'rgba(180,180,180,' },
-  { label: 'Mental Health', x: 440, y: 370, color: 'rgba(160,160,160,' },
+  { label: 'Mental Health', x: 440, y: 280, color: 'rgba(160,160,160,' },
+  { label: 'Recovery', x: 440, y: 370, color: 'rgba(180,180,180,' },
 ];
 
 const hubX = 250;
@@ -277,16 +277,16 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         {/* Input nodes */}
         {inputs.map((inp, i) => (
           <g key={`in-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.08}s` }}>
-            <rect x={inp.x - 28} y={inp.y - 12} width={56} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${inp.color}0.25)`} strokeWidth="0.7" />
-            <circle cx={inp.x + 20} cy={inp.y} r="3.5" fill={`${inp.color}0.8)`} />
-            <text x={inp.x - 22} y={inp.y + 4} fill={`${inp.color}0.65)`} fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.5">{inp.label.toUpperCase()}</text>
+            <rect x={inp.x - 34} y={inp.y - 12} width={68} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${inp.color}0.25)`} strokeWidth="0.7" />
+            <circle cx={inp.x + 24} cy={inp.y} r="3.5" fill={`${inp.color}0.8)`} />
+            <text x={inp.x - 28} y={inp.y + 4} fill={`${inp.color}0.65)`} fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.5">{inp.label.toUpperCase()}</text>
           </g>
         ))}
 
         {/* Output nodes */}
         {outputNodes.map((out, i) => (
           <g key={`out-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.1 + 0.3}s` }}>
-            <rect x={out.x - 18} y={out.y - 12} width={62} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${out.color}0.25)`} strokeWidth="0.7" />
+            <rect x={out.x - 18} y={out.y - 12} width={78} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${out.color}0.25)`} strokeWidth="0.7" />
             <circle cx={out.x - 18} cy={out.y} r="3.5" fill={`${out.color}0.8)`} />
             <text x={out.x - 12} y={out.y + 4} fill={`${out.color}0.65)`} fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.4">{out.label.toUpperCase()}</text>
           </g>
