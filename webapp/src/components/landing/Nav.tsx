@@ -29,13 +29,13 @@ export function Nav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group" aria-label="Sapien Eleven Platforms">
-            <div className="relative flex items-center justify-center" style={{ width: 56, height: 56 }}>
+            <div className="relative flex items-center justify-center" style={{ width: 52, height: 52 }}>
               {/* Subtle neutral glow (white/grey), no background circle */}
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)',
-                  transform: 'scale(1.15)',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%)',
+                  transform: 'scale(1.1)',
                 }}
               />
               <img
@@ -43,9 +43,9 @@ export function Nav() {
                 alt=""
                 className="object-contain relative"
                 style={{
-                  width: 54,
-                  height: 54,
-                  filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.10)) drop-shadow(0 0 14px rgba(255,0,41,0.22))',
+                  width: 50,
+                  height: 50,
+                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.09)) drop-shadow(0 0 12px rgba(255,0,41,0.20))',
                 }}
               />
             </div>
