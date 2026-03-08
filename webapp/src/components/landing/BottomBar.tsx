@@ -58,8 +58,12 @@ export function BottomBar() {
           {/* Right: footer text */}
           <div className="flex-1 flex justify-end">
             <span
-              className="font-ui text-xs tracking-wider"
-              style={{ color: 'rgba(110,110,110,0.75)', letterSpacing: '0.12em' }}
+              className="font-ui text-[10px] tracking-wider"
+              style={{
+                color: 'rgba(110,110,110,0.72)',
+                letterSpacing: '0.10em',
+                whiteSpace: 'nowrap',
+              }}
             >
               Sapien Eleven Platforms Inc. 2026
             </span>
