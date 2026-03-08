@@ -89,18 +89,18 @@ export function Nav() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group" aria-label="Sapien Eleven Platforms">
+          <a href="#" className="flex items-center gap-2 group" aria-label="Sapien Eleven Platforms">
             <div
               ref={logoRef}
               className="relative flex items-center justify-center s11-logoMotion"
-              style={{ width: 52, height: 52, willChange: 'transform' }}
+              style={{ width: 48, height: 48, willChange: 'transform' }}
             >
               {/* Subtle neutral glow (white/grey), no background circle */}
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%)',
-                  transform: 'scale(1.1)',
+                  transform: 'scale(1.05)',
                 }}
               />
               <img
@@ -108,8 +108,8 @@ export function Nav() {
                 alt=""
                 className="object-contain relative"
                 style={{
-                  width: 50,
-                  height: 50,
+                  width: 46,
+                  height: 46,
                   filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.09)) drop-shadow(0 0 12px rgba(255,0,41,0.20))',
                 }}
               />
