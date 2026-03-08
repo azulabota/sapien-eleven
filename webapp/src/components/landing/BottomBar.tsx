@@ -29,7 +29,7 @@ export function BottomBar() {
           {/* Left: icons (≈ 1/3 of the bar) */}
           <div
             className="flex items-center justify-between"
-            style={{ width: '33.333%' }}
+            style={{ width: '33.333%', minWidth: 190 }}
           >
             {links.map((l) => (
               <a
@@ -43,12 +43,14 @@ export function BottomBar() {
                 onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.92')}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.6')}
               >
+                <span className="block p-2">
                 <img
                   src={l.src}
                   alt=""
                   className="block"
-                  style={{ width: 18, height: 18, objectFit: 'contain' }}
+                  style={{ width: 16, height: 16, objectFit: 'contain' }}
                 />
+                </span>
               </a>
             ))}
           </div>
