@@ -24,17 +24,6 @@ interface Cluster {
   driftRadius: number;
 }
 
-interface BrokenLink {
-  fromCluster: number;
-  toCluster: number;
-  fromNode: number;
-  toNode: number;
-  sparkTimer: number;
-  sparkDuration: number;
-  sparkCooldown: number;
-  isActive: boolean;
-  sparkProgress: number;
-}
 
 interface GlitchState {
   active: boolean;
@@ -50,20 +39,31 @@ function BrokenGraphCanvas() {
   const animRef = useRef<number>(0);
   const stateRef = useRef<{
     clusters: Cluster[];
-    brokenLinks: BrokenLink[];
     glitch: GlitchState;
     time: number;
     dpr: number;
   } | null>(null);
 
   const initState = useCallback((width: number, height: number) => {
-    const clusterDefs = [
-      { label: 'WEARABLES', cx: width * 0.15, cy: height * 0.22 },
-      { label: 'NUTRITION', cx: width * 0.82, cy: height * 0.18 },
-      { label: 'WORKOUTS', cx: width * 0.18, cy: height * 0.78 },
-      { label: 'SLEEP', cx: width * 0.8, cy: height * 0.75 },
-      { label: 'MOOD', cx: width * 0.5, cy: height * 0.48 },
-    ];
+    // Wearables in the center, other domains around it.
+    const center = { cx: width * 0.5, cy: height * 0.5 };
+    const ring = {
+      r: Math.min(width, height) * 0.28,
+      cx: center.cx,
+      cy: center.cy,
+    };
+
+    const ringLabels = ['NUTRITION', 'FITNESS', 'MENTAL HEALTH', 'SLEEP', 'RECOVERY', "WOMEN'S HEALTH"];
+    const ringDefs = ringLabels.map((label, i) => {
+      const a = (-Math.PI / 2) + (i * (Math.PI * 2)) / ringLabels.length;
+      return {
+        label,
+        cx: ring.cx + Math.cos(a) * ring.r,
+        cy: ring.cy + Math.sin(a) * ring.r,
+      };
+    });
+
+    const clusterDefs = [{ label: 'WEARABLES', ...center }, ...ringDefs];
 
     const clusters: Cluster[] = clusterDefs.map((def) => {
       const nodeCount = 5 + Math.floor(Math.random() * 3); // 5-7 nodes
@@ -92,23 +92,6 @@ function BrokenGraphCanvas() {
       };
     });
 
-    // Create broken links between cluster pairs
-    const pairs: [number, number][] = [
-      [0, 4], [1, 4], [2, 4], [3, 4], // all to center
-      [0, 1], [2, 3], [0, 2], [1, 3], // edges
-    ];
-
-    const brokenLinks: BrokenLink[] = pairs.map(([from, to]) => ({
-      fromCluster: from,
-      toCluster: to,
-      fromNode: Math.floor(Math.random() * clusters[from].nodes.length),
-      toNode: Math.floor(Math.random() * clusters[to].nodes.length),
-      sparkTimer: 2 + Math.random() * 6,
-      sparkDuration: 0.3 + Math.random() * 0.3,
-      sparkCooldown: 3 + Math.random() * 5,
-      isActive: false,
-      sparkProgress: 0,
-    }));
 
     const glitch: GlitchState = {
       active: false,
@@ -117,7 +100,7 @@ function BrokenGraphCanvas() {
       rows: [],
     };
 
-    return { clusters, brokenLinks, glitch, time: 0, dpr: 1 };
+    return { clusters, glitch, time: 0, dpr: 1 };
   }, []);
 
   useEffect(() => {
@@ -193,92 +176,7 @@ function BrokenGraphCanvas() {
         }
       }
 
-      // ── Draw broken inter-cluster links ─────────────────────────────
-      for (const link of state.brokenLinks) {
-        const fromC = state.clusters[link.fromCluster];
-        const toC = state.clusters[link.toCluster];
-        const fromN = fromC.nodes[link.fromNode];
-        const toN = toC.nodes[link.toNode];
-
-        // Dashed broken line
-        const dashAlpha = 0.08 + 0.04 * Math.sin(t * 0.8 + link.fromCluster);
-        ctx.strokeStyle = `rgba(202,60,61,${dashAlpha})`;
-        ctx.lineWidth = 0.6;
-        ctx.setLineDash([2, 8]);
-        ctx.beginPath();
-        ctx.moveTo(fromN.x, fromN.y);
-        ctx.lineTo(toN.x, toN.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Spark/fizzle effect
-        link.sparkTimer -= dt;
-        if (link.sparkTimer <= 0 && !link.isActive) {
-          link.isActive = true;
-          link.sparkProgress = 0;
-        }
-        if (link.isActive) {
-          link.sparkProgress += dt / link.sparkDuration;
-          if (link.sparkProgress >= 1) {
-            link.isActive = false;
-            link.sparkTimer = link.sparkCooldown + Math.random() * 3;
-          } else {
-            // Draw spark traveling along the line, then fizzling
-            const progress = link.sparkProgress;
-            const sx = fromN.x + (toN.x - fromN.x) * progress;
-            const sy = fromN.y + (toN.y - fromN.y) * progress;
-
-            // Spark glow
-            const sparkAlpha = progress < 0.5 ? progress * 2 : 2 * (1 - progress);
-            const sparkSize = 3 + sparkAlpha * 4;
-
-            // Bright spark core
-            ctx.fillStyle = `rgba(255,120,100,${sparkAlpha * 0.9})`;
-            ctx.beginPath();
-            ctx.arc(sx, sy, sparkSize * 0.4, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Outer glow
-            const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, sparkSize);
-            grd.addColorStop(0, `rgba(202,60,61,${sparkAlpha * 0.7})`);
-            grd.addColorStop(0.5, `rgba(202,60,61,${sparkAlpha * 0.25})`);
-            grd.addColorStop(1, `rgba(202,60,61,0)`);
-            ctx.fillStyle = grd;
-            ctx.beginPath();
-            ctx.arc(sx, sy, sparkSize, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Trailing line from start to spark
-            const trailAlpha = sparkAlpha * 0.4;
-            ctx.strokeStyle = `rgba(202,60,61,${trailAlpha})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(fromN.x, fromN.y);
-            ctx.lineTo(sx, sy);
-            ctx.stroke();
-
-            // Static/electrical micro-sparks near the spark point
-            for (let s = 0; s < 3; s++) {
-              const angle = Math.random() * Math.PI * 2;
-              const dist = 2 + Math.random() * 6;
-              const px = sx + Math.cos(angle) * dist;
-              const py = sy + Math.sin(angle) * dist;
-              ctx.fillStyle = `rgba(255,180,160,${sparkAlpha * 0.5 * Math.random()})`;
-              ctx.beginPath();
-              ctx.arc(px, py, 0.5 + Math.random(), 0, Math.PI * 2);
-              ctx.fill();
-            }
-
-            // If spark reaches ~40-60% of the way, show a red flash X
-            if (progress > 0.35 && progress < 0.65) {
-              ctx.fillStyle = `rgba(202,60,61,${(1 - Math.abs(progress - 0.5) * 6) * 0.6})`;
-              ctx.font = '10px Plus Jakarta Sans, sans-serif';
-              ctx.textAlign = 'center';
-              ctx.fillText('\u2715', sx, sy - 6);
-            }
-          }
-        }
-      }
+      // No fast red “shooting star” sparks here — keep this section calm.
 
       // ── Draw nodes (on top) ─────────────────────────────────────────
       for (const cluster of state.clusters) {
