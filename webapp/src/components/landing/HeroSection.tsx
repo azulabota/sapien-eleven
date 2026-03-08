@@ -387,7 +387,7 @@ export function HeroSection() {
                   lineHeight: 1.06,
                   paddingTop: '0.08em',
                   paddingBottom: '0.02em',
-                  fontSize: 'clamp(1.95rem, 5.05vw, 3.95rem)',
+                  fontSize: 'clamp(1.85rem, 4.85vw, 3.8rem)',
                 }}
               >
                 SAPIEN&nbsp;ELEVEN
