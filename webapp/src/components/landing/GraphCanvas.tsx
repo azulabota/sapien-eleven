@@ -12,14 +12,6 @@ interface NodeData {
   type: 'red' | 'silver';
 }
 
-interface EdgeData {
-  from: number;
-  to: number;
-  travelProgress: number;
-  travelSpeed: number;
-  travelActive: boolean;
-  travelTimer: number;
-}
 
 const RED = 'rgba(202, 60, 61,';
 const SILVER = 'rgba(160, 160, 160,';
@@ -28,7 +20,6 @@ export function GraphCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const nodesRef = useRef<NodeData[]>([]);
-  const edgesRef = useRef<EdgeData[]>([]);
   const sectionsRef = useRef<Array<{ id: string; top: number; height: number }>>([]);
 
   useEffect(() => {
@@ -71,11 +62,11 @@ export function GraphCanvas() {
       const W = getViewport().w;
       const H = worldH;
       const nodes: NodeData[] = [];
-      const edges: EdgeData[] = [];
 
       // Density is tuned to the *viewport* so each screen feels alive (not sparse).
       const viewArea = getViewport().w * getViewport().h;
-      const nodeCount = Math.min(Math.max(Math.floor(viewArea / 18000), 55), 140);
+      // +20% density (user request) since we're removing the fast “shooting star” packets.
+      const nodeCount = Math.min(Math.max(Math.floor((viewArea / 18000) * 1.2), 55), 170);
 
       for (let i = 0; i < nodeCount; i++) {
         nodes.push({
@@ -87,34 +78,12 @@ export function GraphCanvas() {
           pulsePhase: Math.random() * Math.PI * 2,
           pulseSpeed: 0.008 + Math.random() * 0.012,
           opacity: 0.28 + Math.random() * 0.42,
-          // mix: mostly silver, occasional red
-          type: Math.random() < 0.25 ? 'red' : 'silver',
+          // Only floating grey nodes (no red “shooting stars” / packets)
+          type: 'silver',
         });
       }
 
-      const maxDist = Math.min(W, 720) * 0.26;
-      for (let i = 0; i < nodes.length; i++) {
-        let connections = 0;
-        for (let j = i + 1; j < nodes.length; j++) {
-          if (connections >= 3) break;
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          if (Math.sqrt(dx * dx + dy * dy) < maxDist) {
-            edges.push({
-              from: i,
-              to: j,
-              travelProgress: 0,
-              travelSpeed: 0.004 + Math.random() * 0.005,
-              travelActive: false,
-              travelTimer: Math.random() * 320,
-            });
-            connections++;
-          }
-        }
-      }
-
       nodesRef.current = nodes;
-      edgesRef.current = edges;
     };
 
     const draw = () => {
@@ -123,7 +92,6 @@ export function GraphCanvas() {
       const scrollY = window.scrollY || 0;
 
       const nodes = nodesRef.current;
-      const edges = edgesRef.current;
 
       ctx.clearRect(0, 0, vw, vh);
 
@@ -155,71 +123,38 @@ export function GraphCanvas() {
       const viewTop = scrollY - 140;
       const viewBottom = scrollY + vh + 140;
 
-      for (const edge of edges) {
-        const nA = nodes[edge.from];
-        const nB = nodes[edge.to];
-        if (!nA || !nB) continue;
+      // Connection vectors between nearby grey nodes (no fast traveling packets).
+      // “2–3 cm” on most screens is roughly ~80–120 CSS px; we pick a tuned midpoint.
+      const connectionDistPx = (vw < 640 ? 95 : 110) * (mobile ? 0.95 : 1);
+      const connDist2 = connectionDistPx * connectionDistPx;
 
-        // Quick reject if both endpoints are far outside view
-        if ((nA.y < viewTop && nB.y < viewTop) || (nA.y > viewBottom && nB.y > viewBottom)) continue;
+      // Only consider nodes in view for connections to keep it cheap.
+      const viewNodes: Array<{ idx: number; x: number; y: number }> = [];
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        if (n.y < viewTop || n.y > viewBottom) continue;
+        viewNodes.push({ idx: i, x: n.x, y: n.y - scrollY });
+      }
 
-        const ax = nA.x;
-        const ay = nA.y - scrollY;
-        const bx = nB.x;
-        const by = nB.y - scrollY;
+      for (let i = 0; i < viewNodes.length; i++) {
+        const a = viewNodes[i];
+        for (let j = i + 1; j < viewNodes.length; j++) {
+          const b = viewNodes[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > connDist2) continue;
 
-        const dx = bx - ax;
-        const dy = by - ay;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const baseMaxDist = Math.min(vw, 720) * 0.26;
-        const maxDist = baseMaxDist * (1 + 0.18 * sectionEmphasis + 0.12 * keyBoost);
-
-        const isRedEdge = nA.type === 'red' && nB.type === 'red';
-        const col = isRedEdge ? RED : SILVER;
-        const alpha = (1 - dist / maxDist) * (0.075 + 0.03 * sectionEmphasis + 0.02 * keyBoost) * contrast;
-
-        ctx.beginPath();
-        ctx.moveTo(ax, ay);
-        ctx.lineTo(bx, by);
-        ctx.strokeStyle = `${col} ${alpha})`;
-        ctx.lineWidth = 0.55;
-        ctx.stroke();
-
-        // Traveling packet
-        edge.travelTimer--;
-        if (edge.travelTimer <= 0 && !edge.travelActive) {
-          edge.travelActive = true;
-          edge.travelProgress = 0;
-          // More frequent packets when the current section is emphasized.
-          const base = 180 + Math.random() * 380;
-          const faster = base * (1 - 0.35 * sectionEmphasis - 0.2 * keyBoost);
-          edge.travelTimer = Math.max(60, faster);
-        }
-        if (edge.travelActive) {
-          edge.travelProgress += edge.travelSpeed;
-          const px = ax + dx * edge.travelProgress;
-          const py = ay + dy * edge.travelProgress;
-          const packetAlpha = Math.sin(edge.travelProgress * Math.PI) * (0.65 + 0.25 * sectionEmphasis + 0.25 * keyBoost) * contrast;
-          const packetCol = isRedEdge ? RED : SILVER;
+          const dist = Math.sqrt(d2);
+          const t = 1 - dist / connectionDistPx;
+          const alpha = (0.035 + 0.035 * t) * (0.85 + 0.35 * sectionEmphasis + 0.2 * keyBoost) * contrast;
 
           ctx.beginPath();
-          ctx.arc(px, py, 1.8, 0, Math.PI * 2);
-          ctx.fillStyle = `${packetCol} ${packetAlpha})`;
-          ctx.fill();
-
-          const trail1x = ax + dx * (edge.travelProgress - 0.05);
-          const trail1y = ay + dy * (edge.travelProgress - 0.05);
-          ctx.beginPath();
-          ctx.moveTo(trail1x, trail1y);
-          ctx.lineTo(px, py);
-          ctx.strokeStyle = `${packetCol} ${packetAlpha * 0.4})`;
-          ctx.lineWidth = 0.75;
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `${SILVER} ${alpha})`;
+          ctx.lineWidth = 0.6;
           ctx.stroke();
-
-          if (edge.travelProgress >= 1) {
-            edge.travelActive = false;
-            edge.travelProgress = 0;
-          }
         }
       }
 
