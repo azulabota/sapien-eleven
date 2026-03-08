@@ -19,6 +19,7 @@ interface DataPulse {
 
 function DataSphereAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
 
   useEffect(() => {
@@ -126,6 +127,44 @@ function DataSphereAnimation() {
     let rotX = 0.3; // slight tilt
     let time = 0;
 
+    // Hover + tilt interaction
+    let hovering = false;
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+    let tiltX = 0;
+    let tiltY = 0;
+
+    const onEnter = () => {
+      hovering = true;
+    };
+    const onLeave = () => {
+      hovering = false;
+      targetTiltX = 0;
+      targetTiltY = 0;
+    };
+    const onMove = (e: PointerEvent) => {
+      const wrap = wrapperRef.current;
+      if (!wrap) return;
+      const rect = wrap.getBoundingClientRect();
+      const cx0 = rect.left + rect.width / 2;
+      const cy0 = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx0) / Math.max(1, rect.width);
+      const dy = (e.clientY - cy0) / Math.max(1, rect.height);
+
+      // Keep it subtle.
+      targetTiltY = dx * 0.18;
+      targetTiltX = -dy * 0.16;
+    };
+
+    const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+
+    const wrapEl = wrapperRef.current;
+    if (wrapEl && !prefersReduced) {
+      wrapEl.addEventListener('pointerenter', onEnter);
+      wrapEl.addEventListener('pointerleave', onLeave);
+      wrapEl.addEventListener('pointermove', onMove, { passive: true } as any);
+    }
+
     function project(x: number, y: number, z: number): { px: number; py: number; scale: number; depth: number } {
       const scale = perspective / (perspective + z * sphereRadius);
       return {
@@ -155,8 +194,20 @@ function DataSphereAnimation() {
     const draw = () => {
       ctx.clearRect(0, 0, size, size);
       time += 0.016;
-      rotY += 0.003;
-      rotX = 0.3 + Math.sin(time * 0.2) * 0.1; // gentle wobble
+
+      // Base rotation (slow by ~30%)
+      rotY += 0.0021;
+
+      // Hover focus: slow further + slightly stabilize wobble
+      const hoverK = hovering ? 0.55 : 1;
+
+      // Smooth tilt towards cursor (hover only)
+      tiltX += (targetTiltX - tiltX) * 0.08;
+      tiltY += (targetTiltY - tiltY) * 0.08;
+
+      rotX = (0.3 + Math.sin(time * 0.2) * 0.1 * hoverK) + tiltX;
+      const extraY = tiltY;
+      const rotYNow = rotY * (hovering ? 0.7 : 1) + extraY;
 
       // Outer glow ring
       const ringGlow = ctx.createRadialGradient(cx, cy, sphereRadius * 0.95, cx, cy, sphereRadius * 1.35);
@@ -183,7 +234,7 @@ function DataSphereAnimation() {
       const projected: { px: number; py: number; scale: number; depth: number; idx: number }[] = [];
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        const r = rotatePoint(n.x, n.y, n.z, rotY, rotX);
+        const r = rotatePoint(n.x, n.y, n.z, rotYNow, rotX);
         const p = project(r.x, r.y, r.z);
         projected.push({ ...p, idx: i });
       }
@@ -197,6 +248,8 @@ function DataSphereAnimation() {
         projMap.set(p.idx, p);
       }
 
+      const focusBoost = hovering ? 1.22 : 1;
+
       // Draw connections (lines between nearby nodes)
       for (const [i, j] of connections) {
         const pA = projMap.get(i);
@@ -206,7 +259,7 @@ function DataSphereAnimation() {
         // Fade based on average depth (back nodes are more transparent)
         const avgDepth = (pA.depth + pB.depth) / 2;
         const depthFactor = (avgDepth + 1) / 2; // 0 (back) to 1 (front)
-        const alpha = 0.03 + depthFactor * 0.08;
+        const alpha = (0.03 + depthFactor * 0.08) * focusBoost;
 
         const nodeA = nodes[i];
         const nodeB = nodes[j];
@@ -241,7 +294,7 @@ function DataSphereAnimation() {
         const py = pFrom.py + (pTo.py - pFrom.py) * pulse.progress;
         const avgDepth = (pFrom.depth + pTo.depth) / 2;
         const depthFactor = (avgDepth + 1) / 2;
-        const pulseAlpha = 0.3 + depthFactor * 0.5;
+        const pulseAlpha = (0.3 + depthFactor * 0.5) * (hovering ? 1.12 : 1);
         const pulseSize = 1.5 + depthFactor * 1.5;
 
         // Pulse glow
@@ -266,8 +319,8 @@ function DataSphereAnimation() {
         ctx.fill();
       }
 
-      // Spawn new pulses periodically
-      if (Math.random() < 0.04) {
+      // Spawn new pulses periodically (a touch more when hovering)
+      if (Math.random() < (hovering ? 0.055 : 0.04)) {
         spawnPulse();
       }
 
@@ -332,11 +385,20 @@ function DataSphereAnimation() {
     };
 
     draw();
-    return () => cancelAnimationFrame(animRef.current);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      if (wrapEl && !prefersReduced) {
+        wrapEl.removeEventListener('pointerenter', onEnter);
+        wrapEl.removeEventListener('pointerleave', onLeave);
+        wrapEl.removeEventListener('pointermove', onMove as any);
+      }
+      ro.disconnect();
+    };
   }, []);
 
   return (
     <div
+      ref={wrapperRef}
       className="relative flex items-center justify-center"
       style={{ width: 'min(520px, 92vw)', aspectRatio: '1 / 1' }}
     >
