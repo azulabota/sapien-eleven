@@ -65,8 +65,8 @@ export function GraphCanvas() {
 
       // Density is tuned to the *viewport* so each screen feels alive (not sparse).
       const viewArea = getViewport().w * getViewport().h;
-      // +20% density (user request) since we're removing the fast “shooting star” packets.
-      const nodeCount = Math.min(Math.max(Math.floor((viewArea / 18000) * 1.2), 55), 170);
+      // +40% density (user request) since we're removing the fast “shooting star” packets.
+      const nodeCount = Math.min(Math.max(Math.floor((viewArea / 18000) * 1.4), 55), 200);
 
       for (let i = 0; i < nodeCount; i++) {
         nodes.push({
