@@ -341,16 +341,16 @@ function DataSphereAnimation() {
           const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
 
           // Accelerate toward cursor with gentle damping
-          const ax = (dx / dist) * 0.18;
-          const ay = (dy / dist) * 0.18;
-          cp.vx = (cp.vx + ax) * 0.945;
-          cp.vy = (cp.vy + ay) * 0.945;
+          const ax = (dx / dist) * 0.09;
+          const ay = (dy / dist) * 0.09;
+          cp.vx = (cp.vx + ax) * 0.965;
+          cp.vy = (cp.vy + ay) * 0.965;
           cp.x += cp.vx;
           cp.y += cp.vy;
 
-          // Fade out as it approaches cursor (slightly slower so motion feels smoother)
+          // Fade out as it approaches cursor (slower so motion feels smoother)
           const near = Math.max(0, 1 - dist / (sphereRadius * 1.2));
-          cp.life -= 0.010 + near * 0.02;
+          cp.life -= 0.008 + near * 0.015;
 
           const a = Math.max(0, Math.min(1, cp.life));
           const col = cp.isRed ? '202,60,61' : '220,220,220';
