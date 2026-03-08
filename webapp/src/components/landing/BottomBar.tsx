@@ -5,13 +5,13 @@ type IconLink = {
 };
 
 const links: IconLink[] = [
-  // TODO: swap hrefs to your real destinations
-  { href: '#', label: 'Discord', src: '/icons/discord.svg' },
-  { href: '#', label: 'Telegram', src: '/icons/telegram.png' },
+  // Links will be wired later
   { href: '#', label: 'X', src: '/icons/x.svg' },
+  { href: '#', label: 'Telegram', src: '/icons/telegram.svg' },
+  { href: '#', label: 'Discord', src: '/icons/discord.svg' },
   { href: '#', label: 'GitBook', src: '/icons/gitbook.svg' },
-  { href: '#', label: 'Team', src: '/icons/team.svg' },
   { href: '#', label: 'Whitepaper', src: '/icons/whitepaper.svg' },
+  { href: '#', label: 'Team', src: '/icons/team.svg' },
 ];
 
 export function BottomBar() {
@@ -53,8 +53,15 @@ export function BottomBar() {
             ))}
           </div>
 
-          {/* Right: intentionally empty for now (keeps layout future-proof) */}
-          <div className="flex-1" />
+          {/* Right: footer text */}
+          <div className="flex-1 flex justify-end">
+            <span
+              className="font-ui text-xs tracking-wider"
+              style={{ color: 'rgba(110,110,110,0.75)', letterSpacing: '0.12em' }}
+            >
+              Sapien Eleven Platforms Inc. 2026
+            </span>
+          </div>
         </div>
       </div>
     </div>
