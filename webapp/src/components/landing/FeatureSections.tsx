@@ -697,7 +697,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           ];
 
           const radius = 115;
-          ctx.font = '700 10px Plus Jakarta Sans, sans-serif';
+          ctx.font = '500 9px Plus Jakarta Sans, sans-serif';
           ctx.textBaseline = 'middle';
 
           for (let i = 0; i < Math.min(labels.length, cornerSpots.length); i++) {
@@ -707,8 +707,9 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
             // Deterministic per label via phase offsets.
             const phaseA = i * 1.7 + (feature.id.length % 7) * 0.6;
             const phaseB = i * 2.3 + (feature.id.length % 5) * 0.8;
-            const floatX = Math.cos(t * 0.55 + phaseA) * 12 + Math.sin(t * 0.23 + phaseB) * 6;
-            const floatY = Math.sin(t * 0.48 + phaseA) * 10 + Math.cos(t * 0.19 + phaseB) * 5;
+            // Slower drift + smaller travel
+            const floatX = Math.cos(t * 0.22 + phaseA) * 8 + Math.sin(t * 0.11 + phaseB) * 4;
+            const floatY = Math.sin(t * 0.20 + phaseA) * 7 + Math.cos(t * 0.09 + phaseB) * 3;
 
             const sx = base.x + floatX;
             const sy = base.y + floatY;
@@ -719,12 +720,12 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
             if (dist > radius) continue;
 
             const tSpot = 1 - dist / radius;
-            const alpha = (0.04 + 0.42 * tSpot * tSpot) * 0.95;
+            const alpha = (0.02 + 0.26 * tSpot * tSpot) * 0.85;
 
-            // Subtle shadow-grey glow behind text (less “neon”, more premium).
-            const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 46);
-            glow.addColorStop(0, `rgba(140,140,140,${alpha * 0.16})`);
-            glow.addColorStop(1, 'rgba(140,140,140,0)');
+            // Very subtle shadow-grey glow behind text
+            const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 42);
+            glow.addColorStop(0, `rgba(120,120,120,${alpha * 0.12})`);
+            glow.addColorStop(1, 'rgba(120,120,120,0)');
             ctx.fillStyle = glow;
             ctx.beginPath();
             ctx.arc(sx, sy, 46, 0, Math.PI * 2);
@@ -732,11 +733,11 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
 
             // text itself (shadowing grey)
             ctx.save();
-            ctx.shadowColor = `rgba(0,0,0,${Math.min(0.55, 0.25 + alpha * 0.5)})`;
-            ctx.shadowBlur = 6;
+            ctx.shadowColor = `rgba(0,0,0,${Math.min(0.45, 0.18 + alpha * 0.4)})`;
+            ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 1;
-            ctx.fillStyle = `rgba(170,170,170,${alpha})`;
+            ctx.fillStyle = `rgba(150,150,150,${alpha})`;
             ctx.textAlign = base.align;
             ctx.fillText(labels[i], sx, sy);
             ctx.restore();
