@@ -134,10 +134,37 @@ function generateNodeLayout(
   H: number,
   nodeCount: number,
   theme: 'red' | 'silver',
+  variant: FeatureDef['id'],
 ): { nodes: CanvasNode[]; edges: CanvasEdge[] } {
-  const cx = W / 2;
-  const cy = H / 2;
-  const spread = Math.min(W, H) * 0.38;
+  // Subtle per-section shape variation while staying “abstract tech-network”.
+  // (No literal icons—just different geometry: slightly offset hub, ellipse vs circle, edge density.)
+  const baseCx = W / 2;
+  const baseCy = H / 2;
+
+  let cx = baseCx;
+  let cy = baseCy;
+  let spread = Math.min(W, H) * 0.38;
+  let ellipseX = 1;
+  let ellipseY = 1;
+
+  if (variant === 'coaching') {
+    // Slightly larger spread + denser connectivity
+    spread *= 1.03;
+  } else if (variant === 'nutrition') {
+    // Slight offset + slight horizontal ellipse (suggests “flow”)
+    cx = baseCx - W * 0.03;
+    cy = baseCy + H * 0.01;
+    ellipseX = 1.08;
+    ellipseY = 0.96;
+  } else if (variant === 'fitness') {
+    // Slight vertical ellipse (suggests intensity/verticality)
+    ellipseX = 0.96;
+    ellipseY = 1.10;
+    spread *= 1.02;
+  } else if (variant === 'mental-health') {
+    // Tighter, calmer cluster
+    spread *= 0.95;
+  }
 
   const nodes: CanvasNode[] = [];
 
@@ -168,8 +195,8 @@ function generateNodeLayout(
       const angle = (Math.PI * 2 * i) / count + ring * 0.3;
       const jitter = (Math.random() - 0.5) * spread * 0.15;
       const r = baseRadius + jitter;
-      const bx = cx + Math.cos(angle) * r;
-      const by = cy + Math.sin(angle) * r;
+      const bx = cx + Math.cos(angle) * r * ellipseX;
+      const by = cy + Math.sin(angle) * r * ellipseY;
       nodes.push({
         baseX: bx,
         baseY: by,
@@ -191,13 +218,20 @@ function generateNodeLayout(
   for (let i = 1; i < nodes.length; i++) {
     edges.push({ from: 0, to: i });
   }
-  // Interconnect nearby satellites
+
+  // Interconnect nearby satellites (density varies subtly per feature)
+  const density =
+    variant === 'coaching' ? 0.62 :
+    variant === 'fitness' ? 0.58 :
+    variant === 'nutrition' ? 0.54 :
+    0.50; // mental-health: calmest
+
   for (let i = 1; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       const dx = nodes[i].baseX - nodes[j].baseX;
       const dy = nodes[i].baseY - nodes[j].baseY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < spread * 0.55) {
+      if (dist < spread * density) {
         edges.push({ from: i, to: j });
       }
     }
@@ -268,7 +302,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
     if (ctx) ctx.scale(dpr, dpr);
 
     const nodeCount = 10;
-    const { nodes, edges } = generateNodeLayout(W, H, nodeCount, feature.theme);
+    const { nodes, edges } = generateNodeLayout(W, H, nodeCount, feature.theme, feature.id);
 
     // Create data particles
     const particles: DataParticle[] = [];
