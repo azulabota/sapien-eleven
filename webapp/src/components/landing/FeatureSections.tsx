@@ -209,6 +209,20 @@ function generateNodeLayout(
 /* ------------------------------------------------------------------ */
 
 function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isVisible: boolean }) {
+  const getSpotlightLabels = (id: string) => {
+    switch (id) {
+      case 'coaching':
+        return ['NUTRITION', 'FITNESS', 'MENTAL HEALTH'];
+      case 'nutrition':
+        return ['PHOTO LOG', 'MACROS', 'MEAL PLAN'];
+      case 'fitness':
+        return ['WORKOUTS', 'RECOVERY', 'PROGRESS'];
+      case 'mental-health':
+        return ['MOOD', 'BREATHWORK', 'MINDSET'];
+      default:
+        return [];
+    }
+  };
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
@@ -632,6 +646,48 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           ctx.arc(node.x, node.y, r * 0.4, 0, Math.PI * 2);
           ctx.fillStyle = `${col}${nodeAlpha * 0.8})`;
           ctx.fill();
+        }
+      }
+
+      /* --- Spotlight-revealed labels (subtle text that appears under the mouse glow) --- */
+      if (mouse.active) {
+        const labels = getSpotlightLabels(feature.id);
+        if (labels.length) {
+          const pad = 34;
+          const spots = [
+            { x: pad, y: pad },
+            { x: W - pad, y: pad },
+            { x: W - pad, y: H - pad },
+          ];
+
+          const radius = 105;
+          ctx.font = '700 10px Plus Jakarta Sans, sans-serif';
+          ctx.textBaseline = 'middle';
+
+          for (let i = 0; i < Math.min(labels.length, spots.length); i++) {
+            const s = spots[i];
+            const dx = mouse.x - s.x;
+            const dy = mouse.y - s.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > radius) continue;
+
+            const tSpot = 1 - dist / radius;
+            const alpha = (0.05 + 0.45 * tSpot * tSpot) * 0.9;
+
+            // soft glow behind text
+            const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 44);
+            glow.addColorStop(0, `${col}${alpha * 0.22})`);
+            glow.addColorStop(1, `${col}0)`);
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, 44, 0, Math.PI * 2);
+            ctx.fill();
+
+            // text itself
+            ctx.fillStyle = `rgba(220,220,220,${alpha})`;
+            ctx.textAlign = i === 0 ? 'left' : 'right';
+            ctx.fillText(labels[i], s.x, s.y);
+          }
         }
       }
 
