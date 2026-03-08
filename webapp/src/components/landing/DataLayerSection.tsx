@@ -21,10 +21,33 @@ const hubY = 235;
 
 // Example cross-signal queries that animate through
 const queries = [
-  { from: 0, to: 0, text: 'Low sleep → reduce workout intensity' },
-  { from: 1, to: 1, text: 'High stress → adjust macros' },
-  { from: 4, to: 3, text: 'Mood dip → add recovery prompts' },
-  { from: 2, to: 2, text: 'Training load → recalculate nutrition' },
+  // Sleep
+  { from: 0, to: 1, text: 'Low sleep → simplify meal plan' },
+  { from: 0, to: 2, text: 'Poor sleep → reduce workout intensity' },
+  { from: 0, to: 3, text: 'Low sleep → prioritize recovery protocol' },
+
+  // Meal plan / nutrition signals
+  { from: 1, to: 0, text: 'Meal adherence → refine nutrition plan' },
+  { from: 1, to: 1, text: 'Late eating → adjust meal timing' },
+
+  // Workout
+  { from: 2, to: 2, text: 'Training load → update workout plan' },
+  { from: 2, to: 0, text: 'Workout intensity → recalculate calories' },
+  { from: 2, to: 3, text: 'High volume → add recovery support' },
+
+  // Vitals
+  { from: 3, to: 1, text: 'Elevated HR → increase protein + electrolytes' },
+  { from: 3, to: 3, text: 'Low HRV → deload + recovery focus' },
+  { from: 3, to: 2, text: 'Stable vitals → progressive overload' },
+
+  // Coaching
+  { from: 4, to: 2, text: 'Plateau detected → change training stimulus' },
+  { from: 4, to: 0, text: 'Goal shift → update nutrition strategy' },
+
+  // Mood
+  { from: 5, to: 2, text: 'Mood dip → lower intensity + move more' },
+  { from: 5, to: 3, text: 'High stress → add recovery prompts' },
+  { from: 5, to: 1, text: 'High stress → simplify meal plan' },
 ];
 
 // Ambient particle configuration
