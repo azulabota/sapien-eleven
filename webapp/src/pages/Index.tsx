@@ -10,7 +10,7 @@ import { BottomBar } from '@/components/landing/BottomBar';
 
 export default function Index() {
   return (
-    <div className="relative min-h-screen" style={{ background: 'hsl(0 0% 4%)', paddingBottom: 72 }}>
+    <div className="relative min-h-screen" style={{ background: 'hsl(0 0% 4%)' }}>
       {/* Animated graph canvas — fixed, full-page background */}
       <GraphCanvas />
 

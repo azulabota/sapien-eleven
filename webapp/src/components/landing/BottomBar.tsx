@@ -17,7 +17,7 @@ const links: IconLink[] = [
 export function BottomBar() {
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50"
+      className="w-full"
       style={{
         background: 'rgba(8, 8, 8, 0.92)',
         backdropFilter: 'blur(16px)',
