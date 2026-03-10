@@ -523,15 +523,17 @@ export function HeroSection() {
           </p>
 
           {/* CTA buttons */}
-          <div className="hero-reveal flex flex-wrap gap-4">
+          <div className="hero-reveal grid grid-cols-2 gap-4" style={{ maxWidth: 560 }}>
             <button
               className="btn-primary"
+              style={{ width: '100%', justifyContent: 'center' }}
               onClick={() => document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Become a Beta Tester
             </button>
             <button
               className="btn-ghost"
+              style={{ width: '100%', justifyContent: 'center' }}
               onClick={() => document.getElementById('data-layer')?.scrollIntoView({ behavior: 'smooth' })}
             >
               See the Data Layer
@@ -540,7 +542,7 @@ export function HeroSection() {
 
           {/* Stats strip */}
           <div
-            className="hero-reveal flex flex-wrap gap-10 pt-6"
+            className="hero-reveal grid grid-cols-3 gap-6 pt-6"
             style={{ borderTop: '1px solid rgba(160,160,160,0.08)' }}
           >
             {[
@@ -548,7 +550,7 @@ export function HeroSection() {
               { value: '4', label: 'AI Domains' },
               { value: '1', label: 'Unified Layer' },
             ].map((s) => (
-              <div key={s.label}>
+              <div key={s.label} style={{ minWidth: 0 }}>
                 <p
                   className="font-display font-bold"
                   style={{ fontSize: '1.75rem', color: '#CA3C3D', lineHeight: 1 }}
