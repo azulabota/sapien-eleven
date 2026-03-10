@@ -40,9 +40,7 @@ export function Footer() {
           </span>
         </div>
 
-        <p className="font-ui text-xs" style={{ color: 'rgba(60,60,60,1)', letterSpacing: '0.08em' }}>
-          © {new Date().getFullYear()} Sapien Eleven Platforms. All rights reserved.
-        </p>
+        {/* Copyright removed (BottomBar provides footer content) */}
       </div>
     </footer>
   );

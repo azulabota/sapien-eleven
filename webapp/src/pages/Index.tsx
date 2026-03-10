@@ -6,7 +6,7 @@ import { FeatureSections } from '@/components/landing/FeatureSections';
 import { DataLayerSection } from '@/components/landing/DataLayerSection';
 import { CTASection } from '@/components/landing/CTASection';
 import { Footer } from '@/components/landing/Footer';
-// import { BottomBar } from '@/components/landing/BottomBar';
+import { BottomBar } from '@/components/landing/BottomBar';
 
 export default function Index() {
   return (
@@ -25,7 +25,7 @@ export default function Index() {
         <Footer />
       </div>
 
-      {/* Bottom bar removed per request */}
+      <BottomBar />
     </div>
   );
 }
