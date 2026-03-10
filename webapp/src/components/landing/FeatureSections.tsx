@@ -84,9 +84,7 @@ const features: FeatureDef[] = [
       'Personalized meal plan generation that updates with you',
       'Habit-based coaching to build sustainable patterns',
     ],
-    // Keep diagrams in the same abstract tech-network style (silver base).
-    // Use red as the consistent accent for labels + bullets.
-    nodeColor: 'rgba(190,190,190,',
+    nodeColor: 'rgba(255,255,255,',
     accentColor: 'rgba(202,60,61,0.9)',
     theme: 'silver',
     speed: 0.9,
@@ -118,7 +116,7 @@ const features: FeatureDef[] = [
       'Friction-reducing prompts that meet you where you are',
       'Coaching that accounts for your mental state before advising on the physical',
     ],
-    nodeColor: 'rgba(190,190,190,',
+    nodeColor: 'rgba(255,255,255,',
     accentColor: 'rgba(202,60,61,0.9)',
     theme: 'silver',
     speed: 0.6,
