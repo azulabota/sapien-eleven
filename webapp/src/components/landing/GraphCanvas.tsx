@@ -1,5 +1,12 @@
 import { useEffect, useRef } from 'react';
 
+type MouseState = {
+  x: number;
+  y: number;
+  active: boolean;
+  lastClickAt: number;
+};
+
 interface NodeData {
   x: number;
   y: number;
@@ -12,15 +19,19 @@ interface NodeData {
   type: 'red' | 'silver';
 }
 
-
 const RED = 'rgba(202, 60, 61,';
 const SILVER = 'rgba(160, 160, 160,';
+
+function clamp(n: number, a: number, b: number) {
+  return Math.max(a, Math.min(b, n));
+}
 
 export function GraphCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const nodesRef = useRef<NodeData[]>([]);
   const sectionsRef = useRef<Array<{ id: string; top: number; height: number }>>([]);
+  const mouseRef = useRef<MouseState>({ x: -9999, y: -9999, active: false, lastClickAt: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -65,22 +76,45 @@ export function GraphCanvas() {
 
       // Density is tuned to the *viewport* so each screen feels alive (not sparse).
       const viewArea = getViewport().w * getViewport().h;
-      // +40% density (user request) since we're removing the fast “shooting star” packets.
-      const nodeCount = Math.min(Math.max(Math.floor((viewArea / 18000) * 1.4), 55), 200);
+      // More particles + a few soft “clusters”.
+      const nodeCount = Math.min(Math.max(Math.floor((viewArea / 15000) * 1.65), 95), 320);
 
-      for (let i = 0; i < nodeCount; i++) {
+      const clusterCount = clamp(Math.floor(nodeCount / 55), 2, 7);
+      const clusters = Array.from({ length: clusterCount }).map(() => ({
+        cx: Math.random() * W,
+        cy: Math.random() * H,
+        r: (Math.min(W, getViewport().h) * 0.18) * (0.7 + Math.random() * 0.8),
+      }));
+
+      const spawnNode = (x: number, y: number, burst = false) => {
+        const v = burst ? 0.75 : 0.30;
         nodes.push({
-          x: Math.random() * W,
-          y: Math.random() * H,
-          vx: (Math.random() - 0.5) * 0.22,
-          vy: (Math.random() - 0.5) * 0.22,
-          radius: Math.random() * 1.9 + 1.2,
+          x,
+          y,
+          vx: (Math.random() - 0.5) * v,
+          vy: (Math.random() - 0.5) * v,
+          radius: Math.random() * (burst ? 1.8 : 1.6) + (burst ? 1.0 : 0.9),
           pulsePhase: Math.random() * Math.PI * 2,
-          pulseSpeed: 0.008 + Math.random() * 0.012,
-          opacity: 0.28 + Math.random() * 0.42,
-          // Only floating grey nodes (no red “shooting stars” / packets)
+          pulseSpeed: 0.007 + Math.random() * 0.013,
+          opacity: (burst ? 0.42 : 0.26) + Math.random() * 0.44,
           type: 'silver',
         });
+      };
+
+      // Seed clusters (denser pockets)
+      const clusterNodes = Math.floor(nodeCount * 0.62);
+      for (let i = 0; i < clusterNodes; i++) {
+        const c = clusters[i % clusters.length];
+        const a = Math.random() * Math.PI * 2;
+        const rr = c.r * Math.sqrt(Math.random());
+        const x = clamp(c.cx + Math.cos(a) * rr, 0, W);
+        const y = clamp(c.cy + Math.sin(a) * rr, 0, H);
+        spawnNode(x, y);
+      }
+
+      // Fill remaining nodes uniformly
+      while (nodes.length < nodeCount) {
+        spawnNode(Math.random() * W, Math.random() * H);
       }
 
       nodesRef.current = nodes;
@@ -90,6 +124,7 @@ export function GraphCanvas() {
       const vw = getViewport().w;
       const vh = getViewport().h;
       const scrollY = window.scrollY || 0;
+      const mouse = mouseRef.current;
 
       const nodes = nodesRef.current;
 
@@ -118,6 +153,11 @@ export function GraphCanvas() {
       // Mobile contrast bump.
       const mobile = vw < 640;
       const contrast = mobile ? 1.18 : 1;
+
+      // Mouse interaction: repulsion that “pushes” particles around.
+      const influenceRadius = mobile ? 125 : 150;
+      const influenceRadius2 = influenceRadius * influenceRadius;
+      const pushStrength = mobile ? 0.08 : 0.09;
 
       // Only draw what's in view (world-space nodes are spread across the full page height).
       const viewTop = scrollY - 140;
@@ -159,6 +199,31 @@ export function GraphCanvas() {
       }
 
       for (const node of nodes) {
+        // Mouse push (viewport coords → world coords)
+        if (mouse.active) {
+          const mx = mouse.x;
+          const my = mouse.y + scrollY;
+          const dx = node.x - mx;
+          const dy = node.y - my;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > 1 && d2 < influenceRadius2) {
+            const dist = Math.sqrt(d2);
+            const t = 1 - dist / influenceRadius;
+            // Repel outward, with a tiny swirl so it feels organic.
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const swirl = 0.22;
+            const sx = -ny;
+            const sy = nx;
+            node.vx += (nx + sx * swirl) * (pushStrength * t);
+            node.vy += (ny + sy * swirl) * (pushStrength * t);
+          }
+        }
+
+        // Damping to keep things calm.
+        node.vx *= 0.992;
+        node.vy *= 0.992;
+
         node.x += node.vx;
         node.y += node.vy;
         if (node.x < 0 || node.x > vw) node.vx *= -1;
@@ -194,14 +259,71 @@ export function GraphCanvas() {
       animRef.current = requestAnimationFrame(draw);
     };
 
+    const spawnBurstAt = (clientX: number, clientY: number) => {
+      const nodes = nodesRef.current;
+      const vw = getViewport().w;
+      const scrollY = window.scrollY || 0;
+      const worldX = clamp(clientX, 0, vw);
+      const worldY = clamp(clientY + scrollY, 0, worldH);
+
+      // Throttle rapid-fire taps.
+      const now = performance.now();
+      if (now - mouseRef.current.lastClickAt < 120) return;
+      mouseRef.current.lastClickAt = now;
+
+      const burstCount = vw < 640 ? 10 : 14;
+      for (let i = 0; i < burstCount; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const rr = (vw < 640 ? 26 : 34) * Math.sqrt(Math.random());
+        nodes.push({
+          x: clamp(worldX + Math.cos(a) * rr, 0, vw),
+          y: clamp(worldY + Math.sin(a) * rr, 0, worldH),
+          vx: (Math.random() - 0.5) * 1.0,
+          vy: (Math.random() - 0.5) * 1.0,
+          radius: Math.random() * 1.8 + 1.0,
+          pulsePhase: Math.random() * Math.PI * 2,
+          pulseSpeed: 0.010 + Math.random() * 0.016,
+          opacity: 0.36 + Math.random() * 0.48,
+          type: 'silver',
+        });
+      }
+
+      // Keep a soft cap.
+      if (nodes.length > 420) nodesRef.current = nodes.slice(nodes.length - 420);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+      mouseRef.current.active = true;
+    };
+    const onPointerLeave = () => {
+      mouseRef.current.active = false;
+      mouseRef.current.x = -9999;
+      mouseRef.current.y = -9999;
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      // Create new particles on click/tap.
+      spawnBurstAt(e.clientX, e.clientY);
+    };
+
     resize();
     draw();
     window.addEventListener('resize', resize);
     window.addEventListener('scroll', refreshSections, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('blur', onPointerLeave);
+    document.addEventListener('mouseleave', onPointerLeave);
+
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', refreshSections);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('blur', onPointerLeave);
+      document.removeEventListener('mouseleave', onPointerLeave);
     };
   }, []);
 
