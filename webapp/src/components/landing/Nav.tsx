@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { WordmarkSvg } from './WordmarkSvg';
+import NavLogo3D from './NavLogo3D';
 
 export function Nav() {
   const logoRef = useRef<HTMLDivElement>(null);
@@ -19,64 +20,7 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const el = logoRef.current;
-    if (!el) return;
-
-    if (reduceMotion.current) return;
-
-    let raf = 0;
-    let targetRx = 0;
-    let targetRy = 0;
-
-    let rx = 0;
-    let ry = 0;
-
-    const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-
-    const onMove = (e: PointerEvent) => {
-      // Keep the icon fixed in place; just rotate to “face” the cursor.
-      const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-
-      // Normalize cursor offset from the logo center to a [-1..1] range.
-      // (Using viewport units makes it respond even if the cursor isn't directly over the icon.)
-      const dx = (e.clientX - cx) / Math.max(1, window.innerWidth * 0.5);
-      const dy = (e.clientY - cy) / Math.max(1, window.innerHeight * 0.5);
-
-      // “Up to 30% tilt” → interpret as up to ~30deg max rotation.
-      targetRy = clamp(dx * 30, -30, 30);
-      // Slight vertical tilt to enhance the facing effect (cap it so it doesn't look like it's flipping)
-      targetRx = clamp(dy * 18, -18, 18);
-    };
-
-    const onLeave = () => {
-      targetRx = 0;
-      targetRy = 0;
-    };
-
-    const tick = () => {
-      // Smooth follow (responsive but not twitchy)
-      const follow = 0.12;
-      rx += (targetRx - rx) * follow;
-      ry += (targetRy - ry) * follow;
-
-      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-      raf = requestAnimationFrame(tick);
-    };
-
-    // Listen on window so it reacts as the user moves anywhere on screen.
-    window.addEventListener('pointermove', onMove, { passive: true } as any);
-    window.addEventListener('pointerleave', onLeave);
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener('pointermove', onMove as any);
-      window.removeEventListener('pointerleave', onLeave);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
+  // Logo interaction is handled inside <NavLogo3D />.
 
   const handleCTA = () => {
     document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' });
@@ -101,24 +45,8 @@ export function Nav() {
               className="relative flex items-center justify-center s11-logoMotion"
               style={{ width: 48, height: 48, willChange: 'transform' }}
             >
-              {/* Subtle neutral glow (white/grey), no background circle */}
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%)',
-                  transform: 'scale(1.05)',
-                }}
-              />
-              <img
-                src="/brand/icon-red.png"
-                alt=""
-                className="object-contain relative"
-                style={{
-                  width: 46,
-                  height: 46,
-                  filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.09)) drop-shadow(0 0 12px rgba(255,0,41,0.20))',
-                }}
-              />
+              {/* 3D logo (no glow/spotlight behind it) */}
+              <NavLogo3D />
             </div>
 
             <WordmarkSvg className="hidden sm:block" height={15} />
