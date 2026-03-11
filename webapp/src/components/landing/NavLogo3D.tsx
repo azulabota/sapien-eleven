@@ -122,7 +122,7 @@ export default function NavLogo3D() {
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
         // Fixed zoom for navbar so it never jumps sizes across devices/models.
-        camera.zoom = 0.55;
+        camera.zoom = 0.22;
         camera.updateProjectionMatrix();
 
         group.add(model);
