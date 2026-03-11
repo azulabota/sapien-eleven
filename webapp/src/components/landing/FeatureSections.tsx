@@ -286,6 +286,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MOOD' },
           { kind: 'text', text: 'BREATHWORK' },
           { kind: 'text', text: 'MINDSET' },
+          { kind: 'icon', name: 'MHCoach', src: '/spotlight/mhcoach.svg' },
         ];
       default:
         return [];
