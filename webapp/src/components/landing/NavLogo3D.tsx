@@ -33,8 +33,8 @@ export default function NavLogo3D() {
       const img = document.createElement('img');
       img.src = '/brand/icon-red.png';
       img.alt = '';
-      img.style.width = '46px';
-      img.style.height = '46px';
+      img.style.width = '36px';
+      img.style.height = '36px';
       img.style.display = 'block';
       host.appendChild(img);
     };
@@ -121,13 +121,13 @@ export default function NavLogo3D() {
         const maxDim = Math.max(size.x, size.y, size.z);
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
-        // Fixed sizing for navbar so it never jumps sizes across devices/models.
-        camera.zoom = 0.10;
+        // Sizing tuned for a standard navbar icon.
+        camera.zoom = 0.14;
         camera.updateProjectionMatrix();
 
         group.add(model);
-        // Extra safety: scale the whole group down to keep it icon-sized.
-        group.scale.setScalar(0.32);
+        // Scale the whole group so the mark fills its box nicely.
+        group.scale.setScalar(0.42);
 
         // Initial pose (base pose handles the default)
       },
@@ -273,8 +273,8 @@ export default function NavLogo3D() {
       ref={hostRef}
       aria-hidden="true"
       style={{
-        width: 48,
-        height: 48,
+        width: '100%',
+        height: '100%',
         display: 'block',
         cursor: 'pointer',
         willChange: 'transform',
