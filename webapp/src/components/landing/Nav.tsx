@@ -37,19 +37,19 @@ export function Nav() {
       }}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group" aria-label="Sapien Eleven Platforms">
             <div
               ref={logoRef}
               className="relative flex items-center justify-center s11-logoMotion"
-              style={{ width: 48, height: 48, willChange: 'transform' }}
+              style={{ width: 32, height: 32, willChange: 'transform' }}
             >
               {/* 3D logo (no glow/spotlight behind it) */}
               <NavLogo3D />
             </div>
 
-            <WordmarkSvg className="hidden sm:block" height={15} />
+            <WordmarkSvg className="hidden sm:block" height={12} />
           </a>
 
           {/* CTA */}
@@ -61,7 +61,7 @@ export function Nav() {
               Mobile App Coming Soon!
             </span>
             <button
-              className="font-ui text-xs tracking-wider px-5 py-2 rounded transition-all duration-200"
+              className="font-ui text-xs tracking-wider px-4 py-1.5 rounded transition-all duration-200"
               style={{
                 color: 'rgba(220,220,220,0.9)',
                 border: '1px solid rgba(202,60,61,0.7)',
@@ -84,7 +84,7 @@ export function Nav() {
 
           {/* Mobile menu toggle */}
           <button
-            className="lg:hidden p-2"
+            className="lg:hidden p-1.5"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
           >
