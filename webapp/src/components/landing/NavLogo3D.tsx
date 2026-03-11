@@ -27,20 +27,23 @@ export default function NavLogo3D() {
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    camera.position.set(0, 0, 6.2);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 4.6);
 
-    // Lighting (no “spotlight glow” backdrop; just subtle key/fill)
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
-    key.position.set(2.2, 2.8, 3.5);
+    // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
+    const amb = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(amb);
+
+    const key = new THREE.DirectionalLight(0xffffff, 1.0);
+    key.position.set(2.4, 2.6, 3.2);
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0xffffff, 0.55);
-    fill.position.set(-2.4, -0.4, 3.0);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+    fill.position.set(-2.2, -0.4, 3.2);
     scene.add(fill);
 
     const rim = new THREE.DirectionalLight(0xffffff, 0.35);
-    rim.position.set(-2.8, 2.6, -2.8);
+    rim.position.set(-2.8, 2.4, -2.8);
     scene.add(rim);
 
     const group = new THREE.Group();
@@ -64,7 +67,7 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 3.0 / Math.max(0.001, maxDim);
+        const s = 4.2 / Math.max(0.001, maxDim);
         model.scale.setScalar(s);
 
         group.add(model);
@@ -83,6 +86,10 @@ export default function NavLogo3D() {
     // Requested: max 40% left/right/down → interpret as max 40deg.
     const maxTiltDeg = 40;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
+
+    // Base pose so the logo isn't edge-on.
+    const baseRx = THREE.MathUtils.degToRad(12);
+    const baseRy = THREE.MathUtils.degToRad(-28);
 
     let targetRx = 0;
     let targetRy = 0;
@@ -151,8 +158,8 @@ export default function NavLogo3D() {
         rx += (targetRx - rx) * follow;
         ry += (targetRy - ry) * follow;
 
-        group.rotation.x = rx;
-        group.rotation.y = ry;
+        group.rotation.x = baseRx + rx;
+        group.rotation.y = baseRy + ry;
 
         if (spinRemaining > 0) {
           const step = Math.min(spinRemaining, spinSpeed * dt);
