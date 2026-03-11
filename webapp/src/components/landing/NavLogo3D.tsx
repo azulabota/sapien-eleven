@@ -121,11 +121,13 @@ export default function NavLogo3D() {
         const maxDim = Math.max(size.x, size.y, size.z);
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
-        // Fixed zoom for navbar so it never jumps sizes across devices/models.
-        camera.zoom = 0.22;
+        // Fixed sizing for navbar so it never jumps sizes across devices/models.
+        camera.zoom = 0.10;
         camera.updateProjectionMatrix();
 
         group.add(model);
+        // Extra safety: scale the whole group down to keep it icon-sized.
+        group.scale.setScalar(0.32);
 
         // Initial pose (base pose handles the default)
       },
