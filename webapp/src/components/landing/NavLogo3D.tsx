@@ -60,7 +60,7 @@ export default function NavLogo3D() {
 
     // Orthographic camera keeps the logo visually “pinned” (no perspective drift while tilting)
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
-    camera.position.set(0, 0, 10);
+    camera.position.set(0, 0, 12);
     camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
@@ -119,7 +119,7 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 6.0 / Math.max(0.001, maxDim);
+        const s = 2.7 / Math.max(0.001, maxDim);
         model.scale.setScalar(s);
 
         group.add(model);
@@ -140,13 +140,13 @@ export default function NavLogo3D() {
 
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
-    // Requested: max 40% left/right/down → interpret as max 40deg.
-    const maxTiltDeg = 40;
+    // Keep it subtle in the navbar so it doesn't feel like it "moves".
+    const maxTiltDeg = 22;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
-    const baseRx = THREE.MathUtils.degToRad(12);
-    const baseRy = THREE.MathUtils.degToRad(-28);
+    const baseRx = THREE.MathUtils.degToRad(10);
+    const baseRy = THREE.MathUtils.degToRad(-16);
 
     let targetRx = 0;
     let targetRy = 0;
@@ -165,7 +165,7 @@ export default function NavLogo3D() {
 
       // Fit ortho frustum to aspect
       const aspect = w / Math.max(1, h);
-      const frustumH = 3.2;
+      const frustumH = 6.0;
       camera.top = frustumH / 2;
       camera.bottom = -frustumH / 2;
       camera.right = (frustumH * aspect) / 2;
@@ -273,6 +273,7 @@ export default function NavLogo3D() {
         display: 'block',
         cursor: 'pointer',
         willChange: 'transform',
+        overflow: 'hidden',
       }}
     />
   );
