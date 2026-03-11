@@ -52,6 +52,19 @@ interface BackgroundDot {
   pulsePhase: number;
 }
 
+type SpotlightItem =
+  | { kind: 'text'; text: string }
+  | { kind: 'icon'; name: string; src: string; img?: HTMLImageElement };
+
+interface SpotlightParticle {
+  item: SpotlightItem;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  phase: number;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Feature definitions (text content identical to original)           */
 /* ------------------------------------------------------------------ */
@@ -243,16 +256,34 @@ function generateNodeLayout(
 /* ------------------------------------------------------------------ */
 
 function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isVisible: boolean }) {
-  const getSpotlightLabels = (id: string) => {
+  const getSpotlightItems = (id: string): SpotlightItem[] => {
     switch (id) {
       case 'coaching':
-        return ['NUTRITION', 'FITNESS', 'MENTAL HEALTH'];
+        // Text + (later) icons that appear only under the mouse “spotlight”.
+        return [
+          { kind: 'text', text: 'NUTRITION' },
+          { kind: 'text', text: 'FITNESS' },
+          { kind: 'text', text: 'MENTAL HEALTH' },
+          { kind: 'text', text: 'HAi' },
+        ];
       case 'nutrition':
-        return ['PHOTO LOG', 'MACROS', 'MEAL PLAN'];
+        return [
+          { kind: 'text', text: 'PHOTO LOG' },
+          { kind: 'text', text: 'MACROS' },
+          { kind: 'text', text: 'MEAL PLAN' },
+        ];
       case 'fitness':
-        return ['WORKOUTS', 'RECOVERY', 'PROGRESS'];
+        return [
+          { kind: 'text', text: 'WORKOUTS' },
+          { kind: 'text', text: 'RECOVERY' },
+          { kind: 'text', text: 'PROGRESS' },
+        ];
       case 'mental-health':
-        return ['MOOD', 'BREATHWORK', 'MINDSET'];
+        return [
+          { kind: 'text', text: 'MOOD' },
+          { kind: 'text', text: 'BREATHWORK' },
+          { kind: 'text', text: 'MINDSET' },
+        ];
       default:
         return [];
     }
@@ -270,11 +301,13 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
     initialized: boolean;
     canvasW: number;
     canvasH: number;
+    spotlight: SpotlightParticle[];
   }>({
     nodes: [],
     edges: [],
     particles: [],
     bgDots: [],
+    spotlight: [],
     time: 0,
     initialized: false,
     canvasW: 0,
@@ -332,11 +365,24 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       });
     }
 
+    // Create “spotlight” items (free-floating text/icons that only appear under mouse glow)
+    const spotlightItems = getSpotlightItems(feature.id);
+    const spotlight: SpotlightParticle[] = spotlightItems.map((item, i) => {
+      const pad = 36;
+      const x = pad + Math.random() * Math.max(1, W - pad * 2);
+      const y = pad + Math.random() * Math.max(1, H - pad * 2);
+      const baseSpeed = feature.id === 'mental-health' ? 0.06 : 0.09;
+      const vx = (Math.random() - 0.5) * baseSpeed;
+      const vy = (Math.random() - 0.5) * baseSpeed;
+      return { item, x, y, vx, vy, phase: i * 1.7 + Math.random() * 2 };
+    });
+
     stateRef.current = {
       nodes,
       edges,
       particles,
       bgDots,
+      spotlight,
       time: 0,
       initialized: true,
       canvasW: W,
@@ -683,63 +729,91 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         }
       }
 
-      /* --- Spotlight-revealed labels (subtle text that appears under the mouse glow) --- */
-      if (mouse.active) {
-        const labels = getSpotlightLabels(feature.id);
-        if (labels.length) {
-          const pad = 34;
-          const cornerSpots = [
-            { x: pad, y: pad, align: 'left' as const },
-            { x: W - pad, y: pad, align: 'right' as const },
-            { x: W - pad, y: H - pad, align: 'right' as const },
-          ];
+      /* --- Spotlight-revealed floating text/icons (only visible under the mouse glow) --- */
+      if (mouse.active && state.spotlight.length) {
+        const radius = 135;
+        const pad = 28;
 
-          const radius = 115;
-          ctx.font = '500 9px Plus Jakarta Sans, sans-serif';
-          ctx.textBaseline = 'middle';
+        // Update spotlight item motion (more “unlocked”, free-floating)
+        for (const sp of state.spotlight) {
+          // Gentle wandering via sinusoidal nudge
+          const nudge = feature.id === 'mental-health' ? 0.008 : 0.012;
+          sp.vx += Math.cos(t * 0.55 + sp.phase) * nudge;
+          sp.vy += Math.sin(t * 0.50 + sp.phase) * nudge;
 
-          for (let i = 0; i < Math.min(labels.length, cornerSpots.length); i++) {
-            const base = cornerSpots[i];
+          // Damp to prevent runaway speeds
+          sp.vx *= 0.98;
+          sp.vy *= 0.98;
 
-            // Float the label gently inside its corner pocket.
-            // Deterministic per label via phase offsets.
-            const phaseA = i * 1.7 + (feature.id.length % 7) * 0.6;
-            const phaseB = i * 2.3 + (feature.id.length % 5) * 0.8;
-            // Slower drift + smaller travel
-            const floatX = Math.cos(t * 0.22 + phaseA) * 8 + Math.sin(t * 0.11 + phaseB) * 4;
-            const floatY = Math.sin(t * 0.20 + phaseA) * 7 + Math.cos(t * 0.09 + phaseB) * 3;
+          sp.x += sp.vx;
+          sp.y += sp.vy;
 
-            const sx = base.x + floatX;
-            const sy = base.y + floatY;
-
-            const dx = mouse.x - sx;
-            const dy = mouse.y - sy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist > radius) continue;
-
-            const tSpot = 1 - dist / radius;
-            const alpha = (0.02 + 0.26 * tSpot * tSpot) * 0.85;
-
-            // Very subtle shadow-grey glow behind text
-            const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 42);
-            glow.addColorStop(0, `rgba(120,120,120,${alpha * 0.12})`);
-            glow.addColorStop(1, 'rgba(120,120,120,0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(sx, sy, 46, 0, Math.PI * 2);
-            ctx.fill();
-
-            // text itself (shadowing grey)
-            ctx.save();
-            ctx.shadowColor = `rgba(0,0,0,${Math.min(0.45, 0.18 + alpha * 0.4)})`;
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 1;
-            ctx.fillStyle = `rgba(150,150,150,${alpha})`;
-            ctx.textAlign = base.align;
-            ctx.fillText(labels[i], sx, sy);
-            ctx.restore();
+          // Bounce within bounds
+          if (sp.x < pad) {
+            sp.x = pad;
+            sp.vx = Math.abs(sp.vx);
+          } else if (sp.x > W - pad) {
+            sp.x = W - pad;
+            sp.vx = -Math.abs(sp.vx);
           }
+
+          if (sp.y < pad) {
+            sp.y = pad;
+            sp.vy = Math.abs(sp.vy);
+          } else if (sp.y > H - pad) {
+            sp.y = H - pad;
+            sp.vy = -Math.abs(sp.vy);
+          }
+        }
+
+        ctx.font = '500 9px Plus Jakarta Sans, sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+
+        for (const sp of state.spotlight) {
+          const sx = sp.x;
+          const sy = sp.y;
+
+          const dx = mouse.x - sx;
+          const dy = mouse.y - sy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > radius) continue;
+
+          const tSpot = 1 - dist / radius;
+          const alpha = (0.02 + 0.28 * tSpot * tSpot) * 0.9;
+
+          // Very subtle shadow-grey glow behind item
+          const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, 44);
+          glow.addColorStop(0, `rgba(120,120,120,${alpha * 0.12})`);
+          glow.addColorStop(1, 'rgba(120,120,120,0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 50, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.save();
+          ctx.shadowColor = `rgba(0,0,0,${Math.min(0.45, 0.18 + alpha * 0.4)})`;
+          ctx.shadowBlur = 8;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 1;
+
+          if (sp.item.kind === 'text') {
+            ctx.fillStyle = `rgba(150,150,150,${alpha})`;
+            ctx.fillText(sp.item.text, sx, sy);
+          } else {
+            // Icon rendering will be wired up once SVGs are provided.
+            // (We keep the slot here so it can float/spotlight like text.)
+            // Intentionally no-op if img isn't ready.
+            const img = sp.item.img;
+            if (img && img.complete) {
+              const size = 10; // ~same height as 9px text
+              ctx.globalAlpha = alpha;
+              ctx.drawImage(img, sx - size * 0.5, sy - size * 0.5, size, size);
+              ctx.globalAlpha = 1;
+            }
+          }
+
+          ctx.restore();
         }
       }
 
