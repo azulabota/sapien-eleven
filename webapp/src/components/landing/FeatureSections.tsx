@@ -274,6 +274,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'PHOTO LOG' },
           { kind: 'text', text: 'MACROS' },
           { kind: 'text', text: 'MEAL PLAN' },
+          { kind: 'icon', name: 'NCoach', src: '/spotlight/ncoach.svg' },
         ];
       case 'fitness':
         return [
