@@ -121,7 +121,7 @@ export default function NavLogo3D() {
         const maxDim = Math.max(size.x, size.y, size.z);
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
-        camera.zoom = clamp(1.65 / Math.max(0.001, maxDim), 0.2, 8);
+        camera.zoom = clamp(0.95 / Math.max(0.001, maxDim), 0.18, 3.2);
         camera.updateProjectionMatrix();
 
         group.add(model);
