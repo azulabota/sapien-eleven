@@ -20,6 +20,9 @@ export default function NavLogo3D() {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.max(1, Math.min(2, window.devicePixelRatio || 1)));
     renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
 
     // Insert canvas
     host.innerHTML = '';
@@ -27,8 +30,8 @@ export default function NavLogo3D() {
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 0, 4.6);
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+    camera.position.set(0, 0, 3.4);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
     const amb = new THREE.AmbientLight(0xffffff, 0.55);
@@ -58,6 +61,22 @@ export default function NavLogo3D() {
       (gltf) => {
         if (disposed) return;
         const model = gltf.scene;
+
+        // Force a bright, readable material (prevents “black metal” on dark UI)
+        model.traverse((obj) => {
+          const mesh = obj as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.castShadow = false;
+          mesh.receiveShadow = false;
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('#CA3C3D'),
+            emissive: new THREE.Color('#7a1f20'),
+            emissiveIntensity: 0.55,
+            metalness: 0.25,
+            roughness: 0.35,
+          });
+        });
+
         // Normalize scale/center
         const box = new THREE.Box3().setFromObject(model);
         const size = new THREE.Vector3();
@@ -67,13 +86,12 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 4.2 / Math.max(0.001, maxDim);
+        const s = 6.0 / Math.max(0.001, maxDim);
         model.scale.setScalar(s);
 
         group.add(model);
 
-        // Initial pose
-        group.rotation.set(0.10, -0.15, 0);
+        // Initial pose (base pose handles the default)
       },
       undefined,
       () => {
