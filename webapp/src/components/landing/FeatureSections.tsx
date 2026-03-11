@@ -266,6 +266,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MENTAL HEALTH' },
           { kind: 'text', text: 'HAi' },
           { kind: 'icon', name: 'DCI', src: '/spotlight/dci.svg' },
+          { kind: 'icon', name: 'FCoach', src: '/spotlight/fcoach.svg' },
         ];
       case 'nutrition':
         return [
