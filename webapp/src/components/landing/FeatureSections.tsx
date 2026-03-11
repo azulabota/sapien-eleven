@@ -271,9 +271,11 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         ];
       case 'nutrition':
         return [
-          { kind: 'text', text: 'PHOTO LOG' },
-          { kind: 'text', text: 'MACROS' },
+          { kind: 'text', text: 'FOOD LOG' },
           { kind: 'text', text: 'MEAL PLAN' },
+          { kind: 'text', text: 'RECIPES' },
+          { kind: 'text', text: 'MACROS' },
+          { kind: 'text', text: 'MICROS' },
           { kind: 'icon', name: 'NCoach', src: '/spotlight/ncoach.svg' },
         ];
       case 'fitness':
