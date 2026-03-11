@@ -30,8 +30,10 @@ export default function NavLogo3D() {
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
-    camera.position.set(0, 0, 3.4);
+    // Orthographic camera keeps the logo visually “pinned” (no perspective drift while tilting)
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+    camera.position.set(0, 0, 6);
+    camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
     const amb = new THREE.AmbientLight(0xffffff, 0.55);
@@ -86,7 +88,7 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 6.0 / Math.max(0.001, maxDim);
+        const s = 1.55 / Math.max(0.001, maxDim);
         model.scale.setScalar(s);
 
         group.add(model);
@@ -123,7 +125,14 @@ export default function NavLogo3D() {
       const w = Math.max(1, Math.floor(rect.width));
       const h = Math.max(1, Math.floor(rect.height));
       renderer.setSize(w, h, false);
-      camera.aspect = w / h;
+
+      // Fit ortho frustum to aspect
+      const aspect = w / Math.max(1, h);
+      const frustumH = 2.0;
+      camera.top = frustumH / 2;
+      camera.bottom = -frustumH / 2;
+      camera.right = (frustumH * aspect) / 2;
+      camera.left = -(frustumH * aspect) / 2;
       camera.updateProjectionMatrix();
     };
 
