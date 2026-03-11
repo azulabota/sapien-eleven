@@ -119,8 +119,10 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 2.7 / Math.max(0.001, maxDim);
-        model.scale.setScalar(s);
+        // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
+        model.scale.setScalar(1);
+        camera.zoom = clamp(1.65 / Math.max(0.001, maxDim), 0.2, 8);
+        camera.updateProjectionMatrix();
 
         group.add(model);
 
@@ -165,7 +167,7 @@ export default function NavLogo3D() {
 
       // Fit ortho frustum to aspect
       const aspect = w / Math.max(1, h);
-      const frustumH = 6.0;
+      const frustumH = 2.2;
       camera.top = frustumH / 2;
       camera.bottom = -frustumH / 2;
       camera.right = (frustumH * aspect) / 2;
