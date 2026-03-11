@@ -122,12 +122,12 @@ export default function NavLogo3D() {
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
         // Sizing tuned for a standard navbar icon.
-        camera.zoom = 0.14;
+        camera.zoom = 0.12;
         camera.updateProjectionMatrix();
 
         group.add(model);
         // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.42);
+        group.scale.setScalar(0.36);
 
         // Initial pose (base pose handles the default)
       },

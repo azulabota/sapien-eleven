@@ -43,7 +43,7 @@ export function Nav() {
             <div
               ref={logoRef}
               className="relative flex items-center justify-center s11-logoMotion"
-              style={{ width: 40, height: 40, willChange: 'transform' }}
+              style={{ width: 34, height: 34, willChange: 'transform' }}
             >
               {/* 3D logo (no glow/spotlight behind it) */}
               <NavLogo3D />
