@@ -28,8 +28,7 @@ export default function NavLogo3D() {
       powerPreference: 'high-performance',
     } as any);
 
-    // If WebGL2 isn't available, fall back to a static icon (never blank page).
-    if (!gl) {
+    const showFallback = () => {
       host.innerHTML = '';
       const img = document.createElement('img');
       img.src = '/brand/icon-red.png';
@@ -38,6 +37,11 @@ export default function NavLogo3D() {
       img.style.height = '46px';
       img.style.display = 'block';
       host.appendChild(img);
+    };
+
+    // If WebGL2 isn't available, fall back to a static icon (never blank page).
+    if (!gl) {
+      showFallback();
       return;
     }
 
@@ -56,7 +60,7 @@ export default function NavLogo3D() {
 
     // Orthographic camera keeps the logo visually “pinned” (no perspective drift while tilting)
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
-    camera.position.set(0, 0, 6);
+    camera.position.set(0, 0, 10);
     camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
@@ -82,10 +86,13 @@ export default function NavLogo3D() {
     const loader = new GLTFLoader();
     let disposed = false;
 
+    let hasModel = false;
+
     loader.load(
       '/brand/logo-3d.gltf',
       (gltf) => {
         if (disposed) return;
+        hasModel = true;
         const model = gltf.scene;
 
         // Force a bright, readable material (prevents “black metal” on dark UI)
@@ -112,7 +119,7 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const s = 1.55 / Math.max(0.001, maxDim);
+        const s = 6.0 / Math.max(0.001, maxDim);
         model.scale.setScalar(s);
 
         group.add(model);
@@ -121,9 +128,15 @@ export default function NavLogo3D() {
       },
       undefined,
       () => {
-        // no-op (keep empty if load fails)
+        // If load fails, never leave a blank area.
+        if (!disposed) showFallback();
       },
     );
+
+    // If it hasn't loaded quickly, show fallback (avoids the “nothing there” feeling on slow networks)
+    const loadTimeout = window.setTimeout(() => {
+      if (!disposed && !hasModel) showFallback();
+    }, 1800);
 
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
@@ -152,7 +165,7 @@ export default function NavLogo3D() {
 
       // Fit ortho frustum to aspect
       const aspect = w / Math.max(1, h);
-      const frustumH = 2.0;
+      const frustumH = 3.2;
       camera.top = frustumH / 2;
       camera.bottom = -frustumH / 2;
       camera.right = (frustumH * aspect) / 2;
@@ -227,6 +240,7 @@ export default function NavLogo3D() {
 
     return () => {
       disposed = true;
+      window.clearTimeout(loadTimeout);
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove as any);
       window.removeEventListener('pointerleave', onLeave);
