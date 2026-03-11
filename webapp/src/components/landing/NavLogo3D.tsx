@@ -122,12 +122,13 @@ export default function NavLogo3D() {
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
         // Sizing tuned for a standard navbar icon.
-        camera.zoom = 0.06;
+        camera.zoom = 0.03;
         camera.updateProjectionMatrix();
 
         group.add(model);
+        group.position.set(0, 0, 0);
         // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.28);
+        group.scale.setScalar(0.22);
 
         // Initial pose (base pose handles the default)
       },
@@ -170,7 +171,7 @@ export default function NavLogo3D() {
 
       // Fit ortho frustum to aspect
       const aspect = w / Math.max(1, h);
-      const frustumH = 2.2;
+      const frustumH = 3.0;
       camera.top = frustumH / 2;
       camera.bottom = -frustumH / 2;
       camera.right = (frustumH * aspect) / 2;
