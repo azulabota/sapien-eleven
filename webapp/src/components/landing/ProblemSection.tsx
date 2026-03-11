@@ -49,7 +49,7 @@ function BrokenGraphCanvas() {
     const center = { cx: width * 0.5, cy: height * 0.5 };
     const ring = {
       // Spread clusters out a bit more so they don't feel cramped.
-      r: Math.min(width, height) * 0.34,
+      r: Math.min(width, height) * 0.38,
       cx: center.cx,
       cy: center.cy,
     };
