@@ -265,6 +265,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'FITNESS' },
           { kind: 'text', text: 'MENTAL HEALTH' },
           { kind: 'text', text: 'HAi' },
+          { kind: 'icon', name: 'DCI', src: '/spotlight/dci.svg' },
         ];
       case 'nutrition':
         return [
@@ -367,6 +368,16 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
 
     // Create “spotlight” items (free-floating text/icons that only appear under mouse glow)
     const spotlightItems = getSpotlightItems(feature.id);
+
+    // Preload any spotlight icons as images (SVGs in /public).
+    for (const it of spotlightItems) {
+      if (it.kind === 'icon') {
+        const img = new Image();
+        img.src = it.src;
+        it.img = img;
+      }
+    }
+
     const spotlight: SpotlightParticle[] = spotlightItems.map((item, i) => {
       const pad = 36;
       const x = pad + Math.random() * Math.max(1, W - pad * 2);
