@@ -747,12 +747,12 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       }
 
       /* --- Spotlight-revealed floating text/icons (only visible under the mouse glow) --- */
-      if (mouse.active && state.spotlight.length) {
+      if (mouse.active && st.spotlight.length) {
         const radius = 135;
         const pad = 28;
 
         // Update spotlight item motion (more “unlocked”, free-floating)
-        for (const sp of state.spotlight) {
+        for (const sp of st.spotlight) {
           // Gentle wandering via sinusoidal nudge
           const nudge = feature.id === 'mental-health' ? 0.008 : 0.012;
           sp.vx += Math.cos(t * 0.55 + sp.phase) * nudge;
@@ -787,7 +787,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
 
-        for (const sp of state.spotlight) {
+        for (const sp of st.spotlight) {
           const sx = sp.x;
           const sy = sp.y;
 
