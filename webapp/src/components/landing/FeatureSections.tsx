@@ -278,6 +278,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MICROS' },
           { kind: 'icon', name: 'Goals', src: '/spotlight/goals.svg' },
           { kind: 'icon', name: 'Groceries', src: '/spotlight/groceries.svg' },
+          { kind: 'icon', name: 'Image', src: '/spotlight/image.svg' },
           { kind: 'icon', name: 'NCoach', src: '/spotlight/ncoach.svg' },
         ];
       case 'fitness':
