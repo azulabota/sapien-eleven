@@ -280,6 +280,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'icon', name: 'Groceries', src: '/spotlight/groceries.svg' },
           { kind: 'icon', name: 'Image', src: '/spotlight/image.svg' },
           { kind: 'icon', name: 'Log', src: '/spotlight/log.svg' },
+          { kind: 'icon', name: 'Plan', src: '/spotlight/plan.svg' },
           { kind: 'icon', name: 'NCoach', src: '/spotlight/ncoach.svg' },
         ];
       case 'fitness':
