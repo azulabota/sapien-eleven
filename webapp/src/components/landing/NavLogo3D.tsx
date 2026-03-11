@@ -17,7 +17,31 @@ export default function NavLogo3D() {
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    // Create a dedicated canvas + WebGL1 context explicitly.
+    // This avoids Safari/Chrome errors like: "Canvas has an existing context of a different type".
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl', {
+      alpha: true,
+      antialias: true,
+      premultipliedAlpha: true,
+      preserveDrawingBuffer: false,
+      powerPreference: 'high-performance',
+    } as any);
+
+    // If WebGL isn't available, fall back to a static icon.
+    if (!gl) {
+      host.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = '/brand/icon-red.png';
+      img.alt = '';
+      img.style.width = '46px';
+      img.style.height = '46px';
+      img.style.display = 'block';
+      host.appendChild(img);
+      return;
+    }
+
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl as any, alpha: true, antialias: true });
     renderer.setPixelRatio(Math.max(1, Math.min(2, window.devicePixelRatio || 1)));
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
