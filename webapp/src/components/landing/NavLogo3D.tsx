@@ -17,10 +17,10 @@ export default function NavLogo3D() {
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
 
-    // Create a dedicated canvas + WebGL1 context explicitly.
-    // This avoids Safari/Chrome errors like: "Canvas has an existing context of a different type".
+    // Create a dedicated canvas + WebGL2 context explicitly.
+    // Avoids errors like: "Canvas has an existing context of a different type".
     const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl', {
+    const gl = canvas.getContext('webgl2', {
       alpha: true,
       antialias: true,
       premultipliedAlpha: true,
@@ -28,7 +28,7 @@ export default function NavLogo3D() {
       powerPreference: 'high-performance',
     } as any);
 
-    // If WebGL isn't available, fall back to a static icon.
+    // If WebGL2 isn't available, fall back to a static icon (never blank page).
     if (!gl) {
       host.innerHTML = '';
       const img = document.createElement('img');
