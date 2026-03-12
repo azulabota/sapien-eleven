@@ -36,6 +36,9 @@ export default function NavLogo3D() {
       img.style.width = '36px';
       img.style.height = '36px';
       img.style.display = 'block';
+      // Crop any transparent padding inside the PNG so it doesn't look like a black "missing" block on dark nav.
+      img.style.objectFit = 'cover';
+      img.style.objectPosition = 'center';
       host.appendChild(img);
     };
 
