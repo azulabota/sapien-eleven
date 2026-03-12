@@ -57,6 +57,10 @@ export default function NavLogo3D() {
 
     // Insert canvas
     host.innerHTML = '';
+    // Ensure the canvas behaves like a centered block element inside the fixed-size nav box.
+    renderer.domElement.style.display = 'block';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -121,6 +125,12 @@ export default function NavLogo3D() {
         box.getCenter(center);
 
         model.position.sub(center);
+
+        // Recompute and re-center once more (some GLTFs have nested transforms that make the first centering slightly off).
+        const box2 = new THREE.Box3().setFromObject(model);
+        const center2 = new THREE.Vector3();
+        box2.getCenter(center2);
+        model.position.sub(center2);
         const maxDim = Math.max(size.x, size.y, size.z);
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
@@ -131,7 +141,7 @@ export default function NavLogo3D() {
         group.add(model);
         group.position.set(0, 0, 0);
         // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.52);
+        group.scale.setScalar(0.48);
 
         // Initial pose (base pose handles the default)
       },
@@ -150,12 +160,12 @@ export default function NavLogo3D() {
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
     // Keep it subtle in the navbar so it doesn't feel like it "moves".
-    const maxTiltDeg = 22;
+    const maxTiltDeg = 16;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
-    const baseRx = THREE.MathUtils.degToRad(10);
-    const baseRy = THREE.MathUtils.degToRad(-16);
+    const baseRx = THREE.MathUtils.degToRad(9);
+    const baseRy = THREE.MathUtils.degToRad(-12);
 
     let targetRx = 0;
     let targetRy = 0;
