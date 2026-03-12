@@ -135,9 +135,10 @@ export default function NavLogo3D() {
         const maxDim = Math.max(size.x, size.y, size.z);
         // Normalize transforms (some exports carry rotations)
         model.rotation.set(0, 0, 0);
-        // Some exports have a slight baked Z-rotation; cancel it so the mark sits upright.
-        // (Sign is model-dependent; tuned by eye for this asset.)
-        model.rotation.z = THREE.MathUtils.degToRad(8);
+        // Correct baked orientation so the mark sits upright and forward-facing in the navbar.
+        // (These are asset-dependent; tuned by eye for this GLTF.)
+        model.rotation.y = THREE.MathUtils.degToRad(18);
+        model.rotation.z = THREE.MathUtils.degToRad(0);
         model.scale.setScalar(1);
 
         // Sizing tuned for a standard navbar icon.
