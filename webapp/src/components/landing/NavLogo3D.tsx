@@ -136,7 +136,8 @@ export default function NavLogo3D() {
         // Normalize transforms (some exports carry rotations)
         model.rotation.set(0, 0, 0);
         // Some exports have a slight baked Z-rotation; cancel it so the mark sits upright.
-        model.rotation.z = THREE.MathUtils.degToRad(-8);
+        // (Sign is model-dependent; tuned by eye for this asset.)
+        model.rotation.z = THREE.MathUtils.degToRad(8);
         model.scale.setScalar(1);
 
         // Sizing tuned for a standard navbar icon.
@@ -165,7 +166,7 @@ export default function NavLogo3D() {
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
     // Keep it subtle in the navbar so it doesn't feel like it "moves".
-    const maxTiltDeg = 12;
+    const maxTiltDeg = 10;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
