@@ -215,24 +215,24 @@ function DataSphereAnimation() {
       rotX = 0.3 + Math.sin(time * 0.2) * 0.1; // gentle wobble
       const rotYNow = rotY;
 
-      // Outer glow ring
-      const ringGlow = ctx.createRadialGradient(cx, cy, sphereRadius * 0.95, cx, cy, sphereRadius * 1.35);
+      // Outer glow ring (a bit stronger to sell the 3D "hover" feel)
+      const ringGlow = ctx.createRadialGradient(cx, cy, sphereRadius * 0.85, cx, cy, sphereRadius * 1.55);
       ringGlow.addColorStop(0, 'rgba(202,60,61,0)');
-      ringGlow.addColorStop(0.5, `rgba(202,60,61,${0.04 + Math.sin(time * 0.8) * 0.02})`);
-      ringGlow.addColorStop(0.7, `rgba(202,60,61,${0.02 + Math.sin(time * 0.8) * 0.01})`);
+      ringGlow.addColorStop(0.45, `rgba(202,60,61,${0.07 + Math.sin(time * 0.8) * 0.03})`);
+      ringGlow.addColorStop(0.7, `rgba(202,60,61,${0.035 + Math.sin(time * 0.8) * 0.015})`);
       ringGlow.addColorStop(1, 'rgba(202,60,61,0)');
       ctx.beginPath();
-      ctx.arc(cx, cy, sphereRadius * 1.35, 0, Math.PI * 2);
+      ctx.arc(cx, cy, sphereRadius * 1.55, 0, Math.PI * 2);
       ctx.fillStyle = ringGlow;
       ctx.fill();
 
-      // Subtle ambient glow at center
-      const ambientGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, sphereRadius * 0.8);
-      ambientGlow.addColorStop(0, 'rgba(202,60,61,0.03)');
-      ambientGlow.addColorStop(0.5, 'rgba(202,60,61,0.01)');
+      // Ambient glow at center (stronger + larger)
+      const ambientGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, sphereRadius * 1.05);
+      ambientGlow.addColorStop(0, 'rgba(202,60,61,0.05)');
+      ambientGlow.addColorStop(0.5, 'rgba(202,60,61,0.02)');
       ambientGlow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.beginPath();
-      ctx.arc(cx, cy, sphereRadius * 0.8, 0, Math.PI * 2);
+      ctx.arc(cx, cy, sphereRadius * 1.05, 0, Math.PI * 2);
       ctx.fillStyle = ambientGlow;
       ctx.fill();
 
