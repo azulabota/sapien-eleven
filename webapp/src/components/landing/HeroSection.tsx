@@ -440,11 +440,17 @@ function DataSphereAnimation() {
           const col = cp.isRed ? '202,60,61' : '220,220,220';
 
           const g = bgCtx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 6);
-          g.addColorStop(0, `rgba(${col},${0.18 * a})`);
+          g.addColorStop(0, `rgba(${col},${0.22 * a})`);
           g.addColorStop(1, 'rgba(0,0,0,0)');
           bgCtx.beginPath();
           bgCtx.arc(cp.x, cp.y, cp.size * 6, 0, Math.PI * 2);
           bgCtx.fillStyle = g;
+          bgCtx.fill();
+
+          // Core dot (still on background canvas, but helps the "flow" read)
+          bgCtx.beginPath();
+          bgCtx.arc(cp.x, cp.y, cp.size * 0.9, 0, Math.PI * 2);
+          bgCtx.fillStyle = `rgba(${col},${0.55 * a})`;
           bgCtx.fill();
         }
       }
