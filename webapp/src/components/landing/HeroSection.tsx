@@ -355,26 +355,6 @@ function DataSphereAnimation() {
           const a = Math.max(0, Math.min(1, cp.life));
           const col = cp.isRed ? '202,60,61' : '220,220,220';
 
-          // Draw cursor pulses *behind* the sphere so the globe stays in front.
-          ctx.save();
-          ctx.globalCompositeOperation = 'destination-over';
-
-          // Glow
-          const g = ctx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 5);
-          g.addColorStop(0, `rgba(${col},${0.12 * a})`);
-          g.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.beginPath();
-          ctx.arc(cp.x, cp.y, cp.size * 5, 0, Math.PI * 2);
-          ctx.fillStyle = g;
-          ctx.fill();
-
-          // Core
-          ctx.beginPath();
-          ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${col},${0.45 * a})`;
-          ctx.fill();
-
-          ctx.restore();
 
           if (cp.life <= 0) cursorPulses.splice(i, 1);
         }
@@ -439,6 +419,30 @@ function DataSphereAnimation() {
       ctx.strokeStyle = `rgba(160,160,160,${0.03 + Math.sin(time * 0.9) * 0.015})`;
       ctx.lineWidth = 0.5;
       ctx.stroke();
+
+      // Finally: draw cursor pulses behind everything.
+      if (hovering && cursorPulses.length) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        for (const cp of cursorPulses) {
+          const a = Math.max(0, Math.min(1, cp.life));
+          const col = cp.isRed ? '202,60,61' : '220,220,220';
+
+          const g = ctx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 5);
+          g.addColorStop(0, `rgba(${col},${0.12 * a})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath();
+          ctx.arc(cp.x, cp.y, cp.size * 5, 0, Math.PI * 2);
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${col},${0.45 * a})`;
+          ctx.fill();
+        }
+        ctx.restore();
+      }
 
       animRef.current = requestAnimationFrame(draw);
     };
