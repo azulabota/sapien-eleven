@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const inputs = [
-  { label: 'Sleep', x: 60, y: 60, color: 'rgba(190,190,190,' },
-  { label: 'Meal Plan', x: 60, y: 130, color: 'rgba(160,160,160,' },
-  { label: 'Workout', x: 60, y: 200, color: 'rgba(202,60,61,' },
-  { label: 'Vitals', x: 60, y: 270, color: 'rgba(200,200,200,' },
-  { label: 'Coaching', x: 60, y: 340, color: 'rgba(160,160,160,' },
-  { label: 'Mood', x: 60, y: 410, color: 'rgba(202,60,61,' },
+  { label: 'Sleep', x: 50, y: 60, color: 'rgba(190,190,190,' },
+  { label: 'Meal Plan', x: 50, y: 130, color: 'rgba(160,160,160,' },
+  { label: 'Workout', x: 50, y: 200, color: 'rgba(202,60,61,' },
+  { label: 'Vitals', x: 50, y: 270, color: 'rgba(200,200,200,' },
+  { label: 'Coaching', x: 50, y: 340, color: 'rgba(160,160,160,' },
+  { label: 'Mood', x: 50, y: 410, color: 'rgba(202,60,61,' },
 ];
 
 const outputNodes = [
-  { label: 'Nutrition Plan', x: 440, y: 100, color: 'rgba(200,200,200,' },
-  { label: 'Workout Plan', x: 440, y: 190, color: 'rgba(202,60,61,' },
-  { label: 'Mental Health', x: 440, y: 280, color: 'rgba(160,160,160,' },
-  { label: 'Recovery', x: 440, y: 370, color: 'rgba(180,180,180,' },
+  { label: 'Nutrition Plan', x: 450, y: 100, color: 'rgba(200,200,200,' },
+  { label: 'Workout Plan', x: 450, y: 190, color: 'rgba(202,60,61,' },
+  { label: 'Mental Health', x: 450, y: 280, color: 'rgba(160,160,160,' },
+  { label: 'Recovery', x: 450, y: 370, color: 'rgba(180,180,180,' },
 ];
 
 const hubX = 250;
@@ -258,10 +258,10 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         })}
 
         {/* Hub outer rings */}
-        <circle cx={hubX} cy={hubY} r="100" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
-        <circle cx={hubX} cy={hubY} r="72" stroke="rgba(160,160,160,0.12)" strokeWidth="1.1" />
-        <circle cx={hubX} cy={hubY} r="56" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 22px rgba(202,60,61,0.35))' }} />
-        <circle cx={hubX} cy={hubY} r="16" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
+        <circle cx={hubX} cy={hubY} r="90" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
+        <circle cx={hubX} cy={hubY} r="66" stroke="rgba(160,160,160,0.12)" strokeWidth="1.05" />
+        <circle cx={hubX} cy={hubY} r="50" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.9" style={{ filter: 'drop-shadow(0 0 20px rgba(202,60,61,0.35))' }} />
+        <circle cx={hubX} cy={hubY} r="14" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
 
         {/* Radar ping / heartbeat rings */}
         {visible && (
@@ -269,7 +269,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="56"
+              r="50"
               fill="none"
               stroke="rgba(202,60,61,0.45)"
               strokeWidth="1.5"
@@ -281,7 +281,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="56"
+              r="50"
               fill="none"
               stroke="rgba(202,60,61,0.25)"
               strokeWidth="1"
@@ -294,8 +294,8 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           </>
         )}
 
-        <text x={hubX} y={hubY - 72} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="8" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.9">AI + DATA LAYER</text>
-        <text x={hubX} y={hubY + 88} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6">SAPIEN ELEVEN</text>
+        <text x={hubX} y={hubY - 68} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="8" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.9">AI + DATA LAYER</text>
+        <text x={hubX} y={hubY + 80} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6">SAPIEN ELEVEN</text>
 
         {/* Input nodes */}
         {inputs.map((inp, i) => (
