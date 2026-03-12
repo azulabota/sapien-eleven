@@ -133,16 +133,18 @@ export default function NavLogo3D() {
         box2.getCenter(center2);
         model.position.sub(center2);
         const maxDim = Math.max(size.x, size.y, size.z);
-        // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
+        // Normalize transforms (some exports carry rotations)
+        model.rotation.set(0, 0, 0);
         model.scale.setScalar(1);
+
         // Sizing tuned for a standard navbar icon.
-        camera.zoom = 0.028;
+        camera.zoom = 0.03;
         camera.updateProjectionMatrix();
 
         group.add(model);
         group.position.set(0, 0, 0);
-        // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.72);
+        // Slightly larger in navbar.
+        group.scale.setScalar(0.78);
 
         // Initial pose (base pose handles the default)
       },
@@ -165,8 +167,8 @@ export default function NavLogo3D() {
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
-    const baseRx = THREE.MathUtils.degToRad(8);
-    // Keep baseline straight (no right-lean). Depth comes from slight X tilt + lighting.
+    // Baseline: forward-facing.
+    const baseRx = THREE.MathUtils.degToRad(0);
     const baseRy = THREE.MathUtils.degToRad(0);
 
     let targetRx = 0;
