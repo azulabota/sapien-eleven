@@ -50,7 +50,7 @@ export default function NavLogo3D() {
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.45;
 
     // Insert canvas
     host.innerHTML = '';
@@ -58,26 +58,30 @@ export default function NavLogo3D() {
 
     const scene = new THREE.Scene();
 
-    // Orthographic camera keeps the logo visually “pinned” (no perspective drift while tilting)
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
-    camera.position.set(0, 0, 12);
+    // Perspective camera gives the mark real depth (reads more “3D” in the navbar)
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+    camera.position.set(0, 0, 6.5);
     camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
     const amb = new THREE.AmbientLight(0xffffff, 0.55);
     scene.add(amb);
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.0);
-    key.position.set(2.4, 2.6, 3.2);
+    const key = new THREE.DirectionalLight(0xffffff, 1.15);
+    key.position.set(2.8, 2.6, 3.4);
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
-    fill.position.set(-2.2, -0.4, 3.2);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.55);
+    fill.position.set(-2.4, -0.6, 3.0);
     scene.add(fill);
 
-    const rim = new THREE.DirectionalLight(0xffffff, 0.35);
-    rim.position.set(-2.8, 2.4, -2.8);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.5);
+    rim.position.set(-3.2, 2.8, -2.6);
     scene.add(rim);
+
+    const kicker = new THREE.DirectionalLight(0xffffff, 0.25);
+    kicker.position.set(0.0, -2.6, 2.2);
+    scene.add(kicker);
 
     const group = new THREE.Group();
     scene.add(group);
@@ -104,9 +108,9 @@ export default function NavLogo3D() {
           mesh.material = new THREE.MeshStandardMaterial({
             color: new THREE.Color('#CA3C3D'),
             emissive: new THREE.Color('#7a1f20'),
-            emissiveIntensity: 0.55,
-            metalness: 0.25,
-            roughness: 0.35,
+            emissiveIntensity: 0.35,
+            metalness: 0.55,
+            roughness: 0.25,
           });
         });
 
@@ -119,16 +123,14 @@ export default function NavLogo3D() {
 
         model.position.sub(center);
         const maxDim = Math.max(size.x, size.y, size.z);
-        // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
+        // Keep model at unit-ish scale and fit via camera distance + group scale.
         model.scale.setScalar(1);
-        // Sizing tuned for a standard navbar icon.
-        camera.zoom = 0.03;
         camera.updateProjectionMatrix();
 
         group.add(model);
         group.position.set(0, 0, 0);
-        // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.58);
+        // Bigger in the navbar, but keep some breathing room.
+        group.scale.setScalar(0.78);
 
         // Initial pose (base pose handles the default)
       },
@@ -146,13 +148,13 @@ export default function NavLogo3D() {
 
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
-    // Keep it subtle in the navbar so it doesn't feel like it "moves".
-    const maxTiltDeg = 22;
+    // Navbar: keep tilt subtle so the mark doesn't go edge-on and "lose" its side.
+    const maxTiltDeg = 14;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
-    // Base pose so the logo isn't edge-on.
-    const baseRx = THREE.MathUtils.degToRad(10);
-    const baseRy = THREE.MathUtils.degToRad(-16);
+    // Base pose: show some depth even before hover.
+    const baseRx = THREE.MathUtils.degToRad(12);
+    const baseRy = THREE.MathUtils.degToRad(-24);
 
     let targetRx = 0;
     let targetRy = 0;
@@ -169,13 +171,8 @@ export default function NavLogo3D() {
       const h = Math.max(1, Math.floor(rect.height));
       renderer.setSize(w, h, false);
 
-      // Fit ortho frustum to aspect
-      const aspect = w / Math.max(1, h);
-      const frustumH = 3.0;
-      camera.top = frustumH / 2;
-      camera.bottom = -frustumH / 2;
-      camera.right = (frustumH * aspect) / 2;
-      camera.left = -(frustumH * aspect) / 2;
+      // Fit camera to aspect
+      camera.aspect = w / Math.max(1, h);
       camera.updateProjectionMatrix();
     };
 
