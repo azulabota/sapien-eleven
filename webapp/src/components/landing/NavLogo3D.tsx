@@ -135,6 +135,8 @@ export default function NavLogo3D() {
         const maxDim = Math.max(size.x, size.y, size.z);
         // Normalize transforms (some exports carry rotations)
         model.rotation.set(0, 0, 0);
+        // Some exports have a slight baked Z-rotation; cancel it so the mark sits upright.
+        model.rotation.z = THREE.MathUtils.degToRad(-8);
         model.scale.setScalar(1);
 
         // Sizing tuned for a standard navbar icon.
