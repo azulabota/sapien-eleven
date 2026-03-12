@@ -214,7 +214,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <g key={`in-line-${i}`}>
               <line
                 x1={inp.x + 20} y1={inp.y}
-                x2={hubX - 84} y2={hubY}
+                x2={hubX - 44} y2={hubY}
                 stroke={`${inp.color}${isActive ? '0.45' : '0.14'})`}
                 strokeWidth={isActive ? '1.8' : '1.0'}
                 style={{ transition: 'stroke-width 0.3s, stroke 0.3s' }}
@@ -222,7 +222,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
               {/* Traveling packet on active line */}
               {isActive && visible && (
                 <circle
-                  cx={(inp.x + 20) + ((hubX - 84) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
+                  cx={(inp.x + 20) + ((hubX - 44) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
                   cy={inp.y + (hubY - inp.y) * Math.min(packetPos * 2, 1)}
                   r="3"
                   fill={`${inp.color}0.9)`}
@@ -239,7 +239,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           return (
             <g key={`out-line-${i}`}>
               <line
-                x1={hubX + 84} y1={hubY}
+                x1={hubX + 44} y1={hubY}
                 x2={out.x - 18} y2={out.y}
                 stroke={`${out.color}${isActive ? '0.55' : '0.14'})`}
                 strokeWidth={isActive ? '1.8' : '1.0'}
@@ -248,7 +248,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
               {/* Traveling packet on output */}
               {isActive && visible && packetPos > 0.5 && (
                 <circle
-                  cx={(hubX + 84) + ((out.x - 18) - (hubX + 84)) * ((packetPos - 0.5) * 2)}
+                  cx={(hubX + 44) + ((out.x - 18) - (hubX + 44)) * ((packetPos - 0.5) * 2)}
                   cy={hubY + (out.y - hubY) * ((packetPos - 0.5) * 2)}
                   r="3"
                   fill={`${out.color}0.9)`}
@@ -260,10 +260,10 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         })}
 
         {/* Hub outer rings */}
-        <circle cx={hubX} cy={hubY} r="84" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
-        <circle cx={hubX} cy={hubY} r="60" stroke="rgba(160,160,160,0.12)" strokeWidth="1.0" />
-        <circle cx={hubX} cy={hubY} r="46" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.8" style={{ filter: 'drop-shadow(0 0 18px rgba(202,60,61,0.35))' }} />
-        <circle cx={hubX} cy={hubY} r="13" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
+        <circle cx={hubX} cy={hubY} r="80" stroke="rgba(160,160,160,0.06)" strokeWidth="0.85" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
+        <circle cx={hubX} cy={hubY} r="58" stroke="rgba(160,160,160,0.12)" strokeWidth="0.95" />
+        <circle cx={hubX} cy={hubY} r="44" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.75" style={{ filter: 'drop-shadow(0 0 16px rgba(202,60,61,0.35))' }} />
+        <circle cx={hubX} cy={hubY} r="12" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
 
         {/* Radar ping / heartbeat rings */}
         {visible && (
@@ -271,7 +271,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="46"
+              r="44"
               fill="none"
               stroke="rgba(202,60,61,0.45)"
               strokeWidth="1.5"
@@ -283,7 +283,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="46"
+              r="44"
               fill="none"
               stroke="rgba(202,60,61,0.25)"
               strokeWidth="1"
