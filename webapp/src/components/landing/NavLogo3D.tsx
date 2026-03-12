@@ -60,7 +60,7 @@ export default function NavLogo3D() {
 
     // Perspective camera gives the mark real depth (reads more “3D” in the navbar)
     const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-    camera.position.set(0, 0, 6.5);
+    camera.position.set(0, 0, 7.2);
     camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
@@ -130,7 +130,7 @@ export default function NavLogo3D() {
         group.add(model);
         group.position.set(0, 0, 0);
         // Bigger in the navbar, but keep some breathing room.
-        group.scale.setScalar(0.78);
+        group.scale.setScalar(0.66);
 
         // Initial pose (base pose handles the default)
       },
