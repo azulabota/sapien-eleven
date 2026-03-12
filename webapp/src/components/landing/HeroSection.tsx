@@ -355,9 +355,13 @@ function DataSphereAnimation() {
           const a = Math.max(0, Math.min(1, cp.life));
           const col = cp.isRed ? '202,60,61' : '220,220,220';
 
+          // Draw cursor pulses *behind* the sphere so the globe stays in front.
+          ctx.save();
+          ctx.globalCompositeOperation = 'destination-over';
+
           // Glow
           const g = ctx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 5);
-          g.addColorStop(0, `rgba(${col},${0.22 * a})`);
+          g.addColorStop(0, `rgba(${col},${0.12 * a})`);
           g.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.beginPath();
           ctx.arc(cp.x, cp.y, cp.size * 5, 0, Math.PI * 2);
@@ -367,8 +371,10 @@ function DataSphereAnimation() {
           // Core
           ctx.beginPath();
           ctx.arc(cp.x, cp.y, cp.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${col},${0.75 * a})`;
+          ctx.fillStyle = `rgba(${col},${0.45 * a})`;
           ctx.fill();
+
+          ctx.restore();
 
           if (cp.life <= 0) cursorPulses.splice(i, 1);
         }
