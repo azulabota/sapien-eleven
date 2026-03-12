@@ -18,15 +18,20 @@ interface DataPulse {
 }
 
 function DataSphereAnimation() {
+  // Two-layer canvas: background interaction + foreground sphere.
+  const bgCanvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const bgCanvas = bgCanvasRef.current;
+    if (!canvas || !bgCanvas) return;
+
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const bgCtx = bgCanvas.getContext('2d');
+    if (!ctx || !bgCtx) return;
 
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     let size = 400;
@@ -37,11 +42,16 @@ function DataSphereAnimation() {
       // Slightly bigger, still subtle. Scale with container, clamp for sanity.
       const target = rect?.width ? rect.width : 400;
       size = Math.max(320, Math.min(520, target));
-      canvas.width = Math.floor(size * dpr);
-      canvas.height = Math.floor(size * dpr);
-      canvas.style.width = `${size}px`;
-      canvas.style.height = `${size}px`;
+
+      for (const c of [canvas, bgCanvas]) {
+        c.width = Math.floor(size * dpr);
+        c.height = Math.floor(size * dpr);
+        c.style.width = `${size}px`;
+        c.style.height = `${size}px`;
+      }
+
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const getGeom = () => {
@@ -195,6 +205,8 @@ function DataSphereAnimation() {
     }
 
     const draw = () => {
+      // Clear both layers
+      bgCtx.clearRect(0, 0, size, size);
       ctx.clearRect(0, 0, size, size);
       time += 0.016;
 
@@ -420,26 +432,21 @@ function DataSphereAnimation() {
       ctx.lineWidth = 0.5;
       ctx.stroke();
 
-      // Finally: draw cursor pulses behind everything.
-      // (No foreground dots; keep the sphere as the top layer.)
+      // Finally: draw cursor pulses on the BACKGROUND canvas.
+      // This guarantees the sphere layer stays in the foreground.
       if (hovering && cursorPulses.length) {
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-
         for (const cp of cursorPulses) {
           const a = Math.max(0, Math.min(1, cp.life));
           const col = cp.isRed ? '202,60,61' : '220,220,220';
 
-          const g = ctx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 6);
-          g.addColorStop(0, `rgba(${col},${0.14 * a})`);
+          const g = bgCtx.createRadialGradient(cp.x, cp.y, 0, cp.x, cp.y, cp.size * 6);
+          g.addColorStop(0, `rgba(${col},${0.18 * a})`);
           g.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.beginPath();
-          ctx.arc(cp.x, cp.y, cp.size * 6, 0, Math.PI * 2);
-          ctx.fillStyle = g;
-          ctx.fill();
+          bgCtx.beginPath();
+          bgCtx.arc(cp.x, cp.y, cp.size * 6, 0, Math.PI * 2);
+          bgCtx.fillStyle = g;
+          bgCtx.fill();
         }
-
-        ctx.restore();
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -463,7 +470,8 @@ function DataSphereAnimation() {
       className="relative flex items-center justify-center"
       style={{ width: 'min(520px, 92vw)', aspectRatio: '1 / 1' }}
     >
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
+      <canvas ref={bgCanvasRef} className="absolute inset-0" style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
+      <canvas ref={canvasRef} className="absolute inset-0" style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
     </div>
   );
 }
