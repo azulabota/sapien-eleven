@@ -114,6 +114,7 @@ export default function NavLogo3D() {
             emissiveIntensity: 0.55,
             metalness: 0.25,
             roughness: 0.35,
+            side: THREE.DoubleSide,
           });
         });
 
@@ -135,7 +136,7 @@ export default function NavLogo3D() {
         // Keep model at unit-ish scale and fit via ortho camera zoom (more stable across devices)
         model.scale.setScalar(1);
         // Sizing tuned for a standard navbar icon.
-        camera.zoom = 0.03;
+        camera.zoom = 0.028;
         camera.updateProjectionMatrix();
 
         group.add(model);
@@ -160,12 +161,13 @@ export default function NavLogo3D() {
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
     // Keep it subtle in the navbar so it doesn't feel like it "moves".
-    const maxTiltDeg = 16;
+    const maxTiltDeg = 12;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
-    const baseRx = THREE.MathUtils.degToRad(9);
-    const baseRy = THREE.MathUtils.degToRad(-12);
+    const baseRx = THREE.MathUtils.degToRad(8);
+    // Keep baseline straight (no right-lean). Depth comes from slight X tilt + lighting.
+    const baseRy = THREE.MathUtils.degToRad(0);
 
     let targetRx = 0;
     let targetRy = 0;
@@ -184,7 +186,7 @@ export default function NavLogo3D() {
 
       // Fit ortho frustum to aspect
       const aspect = w / Math.max(1, h);
-      const frustumH = 3.0;
+      const frustumH = 3.6;
       camera.top = frustumH / 2;
       camera.bottom = -frustumH / 2;
       camera.right = (frustumH * aspect) / 2;
