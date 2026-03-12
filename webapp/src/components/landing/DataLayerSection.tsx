@@ -1,22 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+// Note: This diagram is tuned in "viewBox space". To make it feel wider left↔right
+// without changing the layout elsewhere, we widen the viewBox and spread x positions.
 const inputs = [
-  { label: 'Sleep', x: 50, y: 60, color: 'rgba(190,190,190,' },
-  { label: 'Meal Plan', x: 50, y: 130, color: 'rgba(160,160,160,' },
-  { label: 'Workout', x: 50, y: 200, color: 'rgba(202,60,61,' },
-  { label: 'Vitals', x: 50, y: 270, color: 'rgba(200,200,200,' },
-  { label: 'Coaching', x: 50, y: 340, color: 'rgba(160,160,160,' },
-  { label: 'Mood', x: 50, y: 410, color: 'rgba(202,60,61,' },
+  { label: 'Sleep', x: 75, y: 60, color: 'rgba(190,190,190,' },
+  { label: 'Meal Plan', x: 75, y: 130, color: 'rgba(160,160,160,' },
+  { label: 'Workout', x: 75, y: 200, color: 'rgba(202,60,61,' },
+  { label: 'Vitals', x: 75, y: 270, color: 'rgba(200,200,200,' },
+  { label: 'Coaching', x: 75, y: 340, color: 'rgba(160,160,160,' },
+  { label: 'Mood', x: 75, y: 410, color: 'rgba(202,60,61,' },
 ];
 
 const outputNodes = [
-  { label: 'Nutrition Plan', x: 450, y: 100, color: 'rgba(200,200,200,' },
-  { label: 'Workout Plan', x: 450, y: 190, color: 'rgba(202,60,61,' },
-  { label: 'Mental Health', x: 450, y: 280, color: 'rgba(160,160,160,' },
-  { label: 'Recovery', x: 450, y: 370, color: 'rgba(180,180,180,' },
+  { label: 'Nutrition Plan', x: 675, y: 100, color: 'rgba(200,200,200,' },
+  { label: 'Workout Plan', x: 675, y: 190, color: 'rgba(202,60,61,' },
+  { label: 'Mental Health', x: 675, y: 280, color: 'rgba(160,160,160,' },
+  { label: 'Recovery', x: 675, y: 370, color: 'rgba(180,180,180,' },
 ];
 
-const hubX = 250;
+const hubX = 375;
 const hubY = 235;
 
 // Example cross-signal queries that animate through
@@ -204,7 +206,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
 
   return (
     <div className="relative w-full aspect-[500/470] max-h-[560px]" style={{ height: 'auto' }}>
-      <svg viewBox="0 0 500 470" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="0 0 750 470" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
         {/* Input -> Hub lines */}
         {inputs.map((inp, i) => {
           const isActive = q.from === i;
@@ -212,7 +214,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <g key={`in-line-${i}`}>
               <line
                 x1={inp.x + 20} y1={inp.y}
-                x2={hubX - 56} y2={hubY}
+                x2={hubX - 84} y2={hubY}
                 stroke={`${inp.color}${isActive ? '0.45' : '0.14'})`}
                 strokeWidth={isActive ? '1.8' : '1.0'}
                 style={{ transition: 'stroke-width 0.3s, stroke 0.3s' }}
@@ -220,7 +222,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
               {/* Traveling packet on active line */}
               {isActive && visible && (
                 <circle
-                  cx={(inp.x + 20) + ((hubX - 56) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
+                  cx={(inp.x + 20) + ((hubX - 84) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
                   cy={inp.y + (hubY - inp.y) * Math.min(packetPos * 2, 1)}
                   r="3"
                   fill={`${inp.color}0.9)`}
@@ -237,7 +239,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           return (
             <g key={`out-line-${i}`}>
               <line
-                x1={hubX + 56} y1={hubY}
+                x1={hubX + 84} y1={hubY}
                 x2={out.x - 18} y2={out.y}
                 stroke={`${out.color}${isActive ? '0.55' : '0.14'})`}
                 strokeWidth={isActive ? '1.8' : '1.0'}
@@ -246,7 +248,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
               {/* Traveling packet on output */}
               {isActive && visible && packetPos > 0.5 && (
                 <circle
-                  cx={(hubX + 56) + ((out.x - 18) - (hubX + 56)) * ((packetPos - 0.5) * 2)}
+                  cx={(hubX + 84) + ((out.x - 18) - (hubX + 84)) * ((packetPos - 0.5) * 2)}
                   cy={hubY + (out.y - hubY) * ((packetPos - 0.5) * 2)}
                   r="3"
                   fill={`${out.color}0.9)`}
@@ -258,10 +260,10 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         })}
 
         {/* Hub outer rings */}
-        <circle cx={hubX} cy={hubY} r="90" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
-        <circle cx={hubX} cy={hubY} r="66" stroke="rgba(160,160,160,0.12)" strokeWidth="1.05" />
-        <circle cx={hubX} cy={hubY} r="50" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.9" style={{ filter: 'drop-shadow(0 0 20px rgba(202,60,61,0.35))' }} />
-        <circle cx={hubX} cy={hubY} r="14" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
+        <circle cx={hubX} cy={hubY} r="84" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
+        <circle cx={hubX} cy={hubY} r="60" stroke="rgba(160,160,160,0.12)" strokeWidth="1.0" />
+        <circle cx={hubX} cy={hubY} r="46" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.8" style={{ filter: 'drop-shadow(0 0 18px rgba(202,60,61,0.35))' }} />
+        <circle cx={hubX} cy={hubY} r="13" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
 
         {/* Radar ping / heartbeat rings */}
         {visible && (
@@ -269,7 +271,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="50"
+              r="46"
               fill="none"
               stroke="rgba(202,60,61,0.45)"
               strokeWidth="1.5"
@@ -281,7 +283,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="50"
+              r="46"
               fill="none"
               stroke="rgba(202,60,61,0.25)"
               strokeWidth="1"
@@ -294,8 +296,8 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           </>
         )}
 
-        <text x={hubX} y={hubY - 68} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="8" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.9">AI + DATA LAYER</text>
-        <text x={hubX} y={hubY + 80} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6">SAPIEN ELEVEN</text>
+        <text x={hubX} y={hubY - 62} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="8" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.9">AI + DATA LAYER</text>
+        <text x={hubX} y={hubY + 74} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6">SAPIEN ELEVEN</text>
 
         {/* Input nodes */}
         {inputs.map((inp, i) => (
@@ -316,8 +318,8 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         ))}
 
         {/* Labels */}
-        <text x="36" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">INPUTS</text>
-        <text x="420" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">OUTPUTS</text>
+        <text x="54" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">INPUTS</text>
+        <text x="630" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">OUTPUTS</text>
       </svg>
 
       {/* Query ticker with cursor blink and entrance animation */}
