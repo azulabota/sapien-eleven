@@ -564,7 +564,11 @@ export function HeroSection() {
                 </p>
                 <p
                   className="font-ui text-xs tracking-widest mt-1"
-                  style={{ color: 'rgba(100,100,100,1)', letterSpacing: '0.12em' }}
+                  style={{
+                    color: 'rgba(100,100,100,1)',
+                    letterSpacing: '0.12em',
+                    paddingLeft: s.value === '∞' ? '0.2rem' : 0,
+                  }}
                 >
                   {s.label.toUpperCase()}
                 </p>
