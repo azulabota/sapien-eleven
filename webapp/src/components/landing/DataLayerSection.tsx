@@ -203,8 +203,8 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
   const q = queries[activeQuery];
 
   return (
-    <div className="relative w-full" style={{ height: 480 }}>
-      <svg viewBox="0 0 500 470" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <div className="relative w-full aspect-[500/470] max-h-[560px]" style={{ height: 'auto' }}>
+      <svg viewBox="0 0 500 470" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
         {/* Input -> Hub lines */}
         {inputs.map((inp, i) => {
           const isActive = q.from === i;
@@ -212,15 +212,15 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <g key={`in-line-${i}`}>
               <line
                 x1={inp.x + 20} y1={inp.y}
-                x2={hubX - 28} y2={hubY}
-                stroke={`${inp.color}${isActive ? '0.4' : '0.12'})`}
-                strokeWidth={isActive ? '1.2' : '0.6'}
+                x2={hubX - 56} y2={hubY}
+                stroke={`${inp.color}${isActive ? '0.45' : '0.14'})`}
+                strokeWidth={isActive ? '1.8' : '1.0'}
                 style={{ transition: 'stroke-width 0.3s, stroke 0.3s' }}
               />
               {/* Traveling packet on active line */}
               {isActive && visible && (
                 <circle
-                  cx={(inp.x + 20) + ((hubX - 28) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
+                  cx={(inp.x + 20) + ((hubX - 56) - (inp.x + 20)) * Math.min(packetPos * 2, 1)}
                   cy={inp.y + (hubY - inp.y) * Math.min(packetPos * 2, 1)}
                   r="3"
                   fill={`${inp.color}0.9)`}
@@ -237,16 +237,16 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           return (
             <g key={`out-line-${i}`}>
               <line
-                x1={hubX + 28} y1={hubY}
+                x1={hubX + 56} y1={hubY}
                 x2={out.x - 18} y2={out.y}
-                stroke={`${out.color}${isActive ? '0.5' : '0.12'})`}
-                strokeWidth={isActive ? '1.2' : '0.6'}
+                stroke={`${out.color}${isActive ? '0.55' : '0.14'})`}
+                strokeWidth={isActive ? '1.8' : '1.0'}
                 style={{ transition: 'stroke-width 0.3s, stroke 0.3s' }}
               />
               {/* Traveling packet on output */}
               {isActive && visible && packetPos > 0.5 && (
                 <circle
-                  cx={(hubX + 28) + ((out.x - 18) - (hubX + 28)) * ((packetPos - 0.5) * 2)}
+                  cx={(hubX + 56) + ((out.x - 18) - (hubX + 56)) * ((packetPos - 0.5) * 2)}
                   cy={hubY + (out.y - hubY) * ((packetPos - 0.5) * 2)}
                   r="3"
                   fill={`${out.color}0.9)`}
@@ -258,10 +258,10 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
         })}
 
         {/* Hub outer rings */}
-        <circle cx={hubX} cy={hubY} r="50" stroke="rgba(160,160,160,0.06)" strokeWidth="0.6" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
-        <circle cx={hubX} cy={hubY} r="36" stroke="rgba(160,160,160,0.12)" strokeWidth="0.8" />
-        <circle cx={hubX} cy={hubY} r="28" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="1.5" style={{ filter: 'drop-shadow(0 0 16px rgba(202,60,61,0.35))' }} />
-        <circle cx={hubX} cy={hubY} r="8" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
+        <circle cx={hubX} cy={hubY} r="100" stroke="rgba(160,160,160,0.06)" strokeWidth="0.9" strokeDasharray="3 5" style={{ animation: 'spin-slow 30s linear infinite' }} />
+        <circle cx={hubX} cy={hubY} r="72" stroke="rgba(160,160,160,0.12)" strokeWidth="1.1" />
+        <circle cx={hubX} cy={hubY} r="56" fill="rgba(10,10,10,0.92)" stroke="rgba(202,60,61,0.55)" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 22px rgba(202,60,61,0.35))' }} />
+        <circle cx={hubX} cy={hubY} r="16" fill="rgba(202,60,61,0.9)" style={{ animation: 'broken-pulse 2s ease-in-out infinite' }} />
 
         {/* Radar ping / heartbeat rings */}
         {visible && (
@@ -269,7 +269,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="28"
+              r="56"
               fill="none"
               stroke="rgba(202,60,61,0.45)"
               strokeWidth="1.5"
@@ -281,7 +281,7 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
             <circle
               cx={hubX}
               cy={hubY}
-              r="28"
+              r="56"
               fill="none"
               stroke="rgba(202,60,61,0.25)"
               strokeWidth="1"
@@ -294,30 +294,30 @@ function DataLayerDiagram({ visible }: { visible: boolean }) {
           </>
         )}
 
-        <text x={hubX} y={hubY - 36} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.8">AI + DATA LAYER</text>
-        <text x={hubX} y={hubY + 44} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="5.5" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.5">SAPIEN ELEVEN</text>
+        <text x={hubX} y={hubY - 72} textAnchor="middle" fill="rgba(160,160,160,0.5)" fontSize="8" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.9">AI + DATA LAYER</text>
+        <text x={hubX} y={hubY + 88} textAnchor="middle" fill="rgba(120,120,120,0.4)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.6">SAPIEN ELEVEN</text>
 
         {/* Input nodes */}
         {inputs.map((inp, i) => (
           <g key={`in-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.08}s` }}>
-            <rect x={inp.x - 34} y={inp.y - 12} width={68} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${inp.color}0.25)`} strokeWidth="0.7" />
-            <circle cx={inp.x + 24} cy={inp.y} r="3.5" fill={`${inp.color}0.8)`} />
-            <text x={inp.x - 28} y={inp.y + 4} fill={`${inp.color}0.65)`} fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.5">{inp.label.toUpperCase()}</text>
+            <rect x={inp.x - 36} y={inp.y - 13} width={72} height={24} rx="2.5" fill="rgba(10,10,10,0.85)" stroke={`${inp.color}0.25)`} strokeWidth="1.2" />
+            <circle cx={inp.x + 26} cy={inp.y} r="4" fill={`${inp.color}0.8)`} />
+            <text x={inp.x - 30} y={inp.y + 5} fill={`${inp.color}0.65)`} fontSize="7.5" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.55">{inp.label.toUpperCase()}</text>
           </g>
         ))}
 
         {/* Output nodes */}
         {outputNodes.map((out, i) => (
           <g key={`out-${i}`} style={{ opacity: visible ? 1 : 0, transition: `opacity 0.4s ease ${i * 0.1 + 0.3}s` }}>
-            <rect x={out.x - 18} y={out.y - 12} width={78} height={22} rx="2" fill="rgba(10,10,10,0.85)" stroke={`${out.color}0.25)`} strokeWidth="0.7" />
-            <circle cx={out.x - 18} cy={out.y} r="3.5" fill={`${out.color}0.8)`} />
-            <text x={out.x - 12} y={out.y + 4} fill={`${out.color}0.65)`} fontSize="6" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.4">{out.label.toUpperCase()}</text>
+            <rect x={out.x - 20} y={out.y - 13} width={84} height={24} rx="2.5" fill="rgba(10,10,10,0.85)" stroke={`${out.color}0.25)`} strokeWidth="1.2" />
+            <circle cx={out.x - 20} cy={out.y} r="4" fill={`${out.color}0.8)`} />
+            <text x={out.x - 14} y={out.y + 5} fill={`${out.color}0.65)`} fontSize="7.5" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="0.45">{out.label.toUpperCase()}</text>
           </g>
         ))}
 
         {/* Labels */}
-        <text x="36" y="20" fill="rgba(120,120,120,0.35)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1">INPUTS</text>
-        <text x="420" y="20" fill="rgba(120,120,120,0.35)" fontSize="7" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1">OUTPUTS</text>
+        <text x="36" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">INPUTS</text>
+        <text x="420" y="20" fill="rgba(120,120,120,0.4)" fontSize="9" fontFamily="Plus Jakarta Sans, sans-serif" letterSpacing="1.2">OUTPUTS</text>
       </svg>
 
       {/* Query ticker with cursor blink and entrance animation */}

@@ -553,7 +553,7 @@ export function HeroSection() {
               <div key={s.label} style={{ minWidth: 0 }}>
                 <p
                   className="font-display font-bold"
-                  style={{ fontSize: '1.75rem', color: '#CA3C3D', lineHeight: 1 }}
+                  style={{ fontSize: s.value === '∞' ? '2.25rem' : '1.75rem', color: '#CA3C3D', lineHeight: 1 }}
                 >
                   {s.value}
                 </p>

@@ -128,7 +128,7 @@ export default function NavLogo3D() {
         group.add(model);
         group.position.set(0, 0, 0);
         // Scale the whole group so the mark fills its box nicely.
-        group.scale.setScalar(0.22);
+        group.scale.setScalar(0.44);
 
         // Initial pose (base pose handles the default)
       },
