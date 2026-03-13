@@ -167,7 +167,7 @@ export default function NavLogo3D() {
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
     // Keep it subtle in the navbar so it doesn't feel like it "moves".
-    const maxTiltDeg = 16;
+    const maxTiltDeg = 22;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
@@ -245,7 +245,7 @@ export default function NavLogo3D() {
       last = now;
 
       if (!reduceMotion) {
-        const follow = 0.16;
+        const follow = 0.20;
         rx += (targetRx - rx) * follow;
         ry += (targetRy - ry) * follow;
 
