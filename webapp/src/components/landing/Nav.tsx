@@ -46,7 +46,7 @@ export function Nav() {
             >
               {/* Static logo (SVG) */}
               <img
-                src="/brand/icon-red.png"
+                src="/brand/s-logo-red.svg"
                 alt="Sapien Eleven"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
