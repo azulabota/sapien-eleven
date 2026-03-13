@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { WordmarkSvg } from './WordmarkSvg';
-import NavLogo3D from './NavLogo3D';
 
 export function Nav() {
   const logoRef = useRef<HTMLDivElement>(null);
@@ -45,8 +44,12 @@ export function Nav() {
               className="relative flex items-center justify-center s11-logoMotion"
               style={{ width: 40, height: 40, willChange: 'transform' }}
             >
-              {/* 3D logo (no glow/spotlight behind it) */}
-              <NavLogo3D />
+              {/* Static logo (SVG) */}
+              <img
+                src="/brand/wordmark-white.svg"
+                alt="Sapien Eleven"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </div>
 
             <WordmarkSvg className="hidden sm:block" height={14} />
