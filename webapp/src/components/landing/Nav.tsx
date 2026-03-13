@@ -12,11 +12,49 @@ export function Nav() {
 
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    let lastY = window.scrollY;
+    let ticking = false;
+    let stopTimer: number | null = null;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+
+      // background/blur style after a bit of scroll
+      setScrolled(y > 40);
+
+      // Determine direction
+      const dy = y - lastY;
+
+      // Show if user scrolls up, hide if scrolling down (after a small threshold)
+      if (dy < -6) setNavVisible(true);
+      if (dy > 10 && y > 80) setNavVisible(false);
+
+      lastY = y;
+
+      // If the user stops scrolling for a moment, show the nav
+      if (stopTimer) window.clearTimeout(stopTimer);
+      stopTimer = window.setTimeout(() => {
+        setNavVisible(true);
+      }, 220);
+    };
+
+    const onScrollRaf = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        onScroll();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScrollRaf, { passive: true } as any);
+    return () => {
+      window.removeEventListener('scroll', onScrollRaf as any);
+      if (stopTimer) window.clearTimeout(stopTimer);
+    };
   }, []);
 
   // Logo interaction is handled inside <NavLogo3D />.
@@ -30,6 +68,7 @@ export function Nav() {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
+        transform: navVisible ? 'translateY(0)' : 'translateY(-110%)',
         background: scrolled ? 'rgba(8, 8, 8, 0.94)' : 'transparent',
         backdropFilter: scrolled ? 'blur(16px)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(202, 60, 61, 0.12)' : '1px solid transparent',
