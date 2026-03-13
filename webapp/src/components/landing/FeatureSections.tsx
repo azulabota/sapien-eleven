@@ -285,9 +285,14 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         ];
       case 'fitness':
         return [
-          { kind: 'text', text: 'WORKOUTS' },
-          { kind: 'text', text: 'RECOVERY' },
-          { kind: 'text', text: 'PROGRESS' },
+          { kind: 'text', text: 'EXERCISE' },
+          { kind: 'text', text: 'VITALS' },
+          { kind: 'text', text: 'HIIT' },
+          { kind: 'text', text: 'YOGA' },
+          { kind: 'text', text: 'MOBILITY' },
+          { kind: 'text', text: 'CARDIO' },
+          { kind: 'text', text: 'STRENGTH' },
+          // Icons will be appended here as you send them.
         ];
       case 'mental-health':
         return [
