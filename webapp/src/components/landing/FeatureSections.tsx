@@ -295,6 +295,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'icon', name: 'Vitals', src: '/spotlight/vitals.svg' },
           { kind: 'icon', name: 'Plan', src: '/spotlight/plan-fitness.svg' },
           { kind: 'icon', name: 'Log', src: '/spotlight/log-fitness.svg' },
+          { kind: 'icon', name: 'Generator', src: '/spotlight/generator.svg' },
           // Icons will be appended here as you send them.
         ];
       case 'mental-health':
