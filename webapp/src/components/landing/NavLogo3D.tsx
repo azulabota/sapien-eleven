@@ -137,7 +137,7 @@ export default function NavLogo3D() {
         model.rotation.set(0, 0, 0);
         // Correct baked orientation so the mark sits upright and forward-facing in the navbar.
         // (These are asset-dependent; tuned by eye for this GLTF.)
-        model.rotation.y = THREE.MathUtils.degToRad(8);
+        model.rotation.y = THREE.MathUtils.degToRad(0);
         model.rotation.z = THREE.MathUtils.degToRad(0);
         model.scale.setScalar(1);
 
