@@ -292,6 +292,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MOBILITY' },
           { kind: 'text', text: 'CARDIO' },
           { kind: 'text', text: 'STRENGTH' },
+          { kind: 'icon', name: 'Vitals', src: '/spotlight/vitals.svg' },
           // Icons will be appended here as you send them.
         ];
       case 'mental-health':
