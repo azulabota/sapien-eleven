@@ -537,7 +537,7 @@ export function HeroSection() {
 
           {/* Tagline */}
           <p
-            className="hero-reveal font-body leading-relaxed max-w-lg"
+            className="hero-reveal font-body leading-relaxed max-w-2xl"
             style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: 'rgba(155,155,155,1)' }}
           >
             The Decentralized Health Economy built to unify your data,
