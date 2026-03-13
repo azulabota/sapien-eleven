@@ -35,14 +35,14 @@ export function Nav() {
         borderBottom: scrolled ? '1px solid rgba(202, 60, 61, 0.12)' : '1px solid transparent',
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto px-5 lg:px-10">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group" aria-label="Sapien Eleven Platforms">
             <div
               ref={logoRef}
               className="relative flex items-center justify-center s11-logoMotion"
-              style={{ width: 40, height: 40, willChange: 'transform' }}
+              style={{ width: 36, height: 36, willChange: 'transform' }}
             >
               {/* Static logo (SVG) */}
               <img
