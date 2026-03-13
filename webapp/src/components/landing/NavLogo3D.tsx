@@ -65,9 +65,9 @@ export default function NavLogo3D() {
 
     const scene = new THREE.Scene();
 
-    // Perspective camera helps the mark read as truly 3D in the navbar.
-    const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 100);
-    camera.position.set(0, 0, 7.5);
+    // Orthographic camera keeps the logo visually “pinned” (no perspective drift while tilting)
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+    camera.position.set(0, 0, 12);
     camera.lookAt(0, 0, 0);
 
     // Lighting (no “spotlight glow” backdrop; just subtle key/fill/ambient)
@@ -102,26 +102,20 @@ export default function NavLogo3D() {
         hasModel = true;
         const model = gltf.scene;
 
-        // Keep the GLTF's original materials (preserves bevel/normal detail),
-        // but enforce readable red tint + double-sided to avoid missing faces at angles.
+        // Force a bright, readable material (prevents “black metal” on dark UI)
         model.traverse((obj) => {
           const mesh = obj as THREE.Mesh;
           if (!mesh.isMesh) return;
           mesh.castShadow = false;
           mesh.receiveShadow = false;
-
-          const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          for (const m of mats) {
-            const mat: any = m;
-            if (!mat) continue;
-            mat.side = THREE.DoubleSide;
-            if (mat.color?.set) mat.color.set('#CA3C3D');
-            if (mat.emissive?.set) mat.emissive.set('#7a1f20');
-            if (typeof mat.emissiveIntensity === 'number') mat.emissiveIntensity = 0.35;
-            if (typeof mat.metalness === 'number') mat.metalness = 0.35;
-            if (typeof mat.roughness === 'number') mat.roughness = 0.35;
-            mat.needsUpdate = true;
-          }
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color('#CA3C3D'),
+            emissive: new THREE.Color('#7a1f20'),
+            emissiveIntensity: 0.55,
+            metalness: 0.25,
+            roughness: 0.35,
+            side: THREE.DoubleSide,
+          });
         });
 
         // Normalize scale/center
@@ -147,7 +141,8 @@ export default function NavLogo3D() {
         model.rotation.z = THREE.MathUtils.degToRad(0);
         model.scale.setScalar(1);
 
-        // Update camera projection (perspective)
+        // Sizing tuned for a standard navbar icon.
+        camera.zoom = 0.03;
         camera.updateProjectionMatrix();
 
         group.add(model);
@@ -171,14 +166,13 @@ export default function NavLogo3D() {
 
     const mouse: MouseState = { x: -9999, y: -9999, active: false };
 
-    // Keep it readable in the navbar.
-    const maxTiltDeg = 16;
+    // Keep it subtle in the navbar so it doesn't feel like it "moves".
+    const maxTiltDeg = 22;
     const maxTilt = THREE.MathUtils.degToRad(maxTiltDeg);
 
     // Base pose so the logo isn't edge-on.
     // Baseline: forward-facing.
-    // Base pose: a touch of forward tilt helps show depth even before hover.
-    const baseRx = THREE.MathUtils.degToRad(6);
+    const baseRx = THREE.MathUtils.degToRad(0);
     const baseRy = THREE.MathUtils.degToRad(0);
 
     let targetRx = 0;
@@ -196,7 +190,13 @@ export default function NavLogo3D() {
       const h = Math.max(1, Math.floor(rect.height));
       renderer.setSize(w, h, false);
 
-      camera.aspect = w / Math.max(1, h);
+      // Fit ortho frustum to aspect
+      const aspect = w / Math.max(1, h);
+      const frustumH = 3.6;
+      camera.top = frustumH / 2;
+      camera.bottom = -frustumH / 2;
+      camera.right = (frustumH * aspect) / 2;
+      camera.left = -(frustumH * aspect) / 2;
       camera.updateProjectionMatrix();
     };
 
