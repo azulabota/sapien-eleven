@@ -360,7 +360,7 @@ export function CTASection() {
     <section
       id="cta"
       ref={sectionRef}
-      className="relative py-32 px-6 overflow-hidden"
+      className="relative py-20 px-6 overflow-hidden"
     >
       {/* Canvas background animation */}
       <canvas

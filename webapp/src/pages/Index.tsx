@@ -23,6 +23,7 @@ export default function Index() {
         <DataLayerSection />
         <CTASection />
         <Footer />
+        <div style={{ height: 0 }} />
       </div>
 
       <BottomBar />
