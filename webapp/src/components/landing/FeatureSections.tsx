@@ -293,6 +293,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MOBILITY' },
           { kind: 'text', text: 'CARDIO' },
           { kind: 'text', text: 'STRENGTH' },
+          { kind: 'text', text: 'RECOVERY' },
           { kind: 'icon', name: 'Vitals', src: '/spotlight/vitals.svg' },
           { kind: 'icon', name: 'Plan', src: '/spotlight/plan-fitness.svg' },
           { kind: 'icon', name: 'Log', src: '/spotlight/log-fitness.svg' },
