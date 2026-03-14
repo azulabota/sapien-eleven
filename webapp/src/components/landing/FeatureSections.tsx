@@ -310,6 +310,7 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
           { kind: 'text', text: 'MENTAL HEALTH' },
           { kind: 'icon', name: 'MHCoach', src: '/spotlight/mhcoach.svg' },
           { kind: 'icon', name: 'Sleep', src: '/spotlight/sleep.svg' },
+          { kind: 'icon', name: 'Resilience', src: '/spotlight/resilience.svg' },
           // Icons will be appended here as you send them.
         ];
       default:
