@@ -81,7 +81,7 @@ export function Nav() {
             <div
               ref={logoRef}
               className="relative flex items-center justify-center s11-logoMotion"
-              style={{ width: 34, height: 34, willChange: 'transform' }}
+              style={{ width: 28, height: 28, willChange: 'transform' }}
             >
               {/* Static logo (SVG) */}
               <img
@@ -91,7 +91,7 @@ export function Nav() {
               />
             </div>
 
-            <WordmarkSvg className="hidden sm:block" height={14} />
+            <WordmarkSvg className="hidden sm:block" height={11} />
           </a>
 
           {/* CTA */}
