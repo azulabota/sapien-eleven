@@ -63,6 +63,7 @@ interface SpotlightParticle {
   vx: number;
   vy: number;
   phase: number;
+  seed: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -405,7 +406,15 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       const baseSpeed = feature.id === 'mental-health' ? 0.06 : 0.09;
       const vx = (Math.random() - 0.5) * baseSpeed;
       const vy = (Math.random() - 0.5) * baseSpeed;
-      return { item, x, y, vx, vy, phase: i * 1.7 + Math.random() * 2 };
+      return {
+        item,
+        x,
+        y,
+        vx,
+        vy,
+        phase: i * 1.7 + Math.random() * 2,
+        seed: Math.random() * 1000,
+      };
     });
 
     stateRef.current = {
@@ -765,16 +774,36 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
         const radius = 135;
         const pad = 28;
 
-        // Update spotlight item motion (more “unlocked”, free-floating)
+        // Update spotlight item motion: random-ish drift + center avoidance (so they can roam anywhere)
+        const avoidCx = W * 0.5;
+        const avoidCy = H * 0.5;
+        const avoidR = Math.min(W, H) * 0.22; // keep them out of the busy center animation
+
+        // cheap smooth noise (deterministic per seed)
+        const noise = (x: number) => Math.sin(x) * 0.5 + Math.sin(x * 0.73 + 1.7) * 0.3 + Math.sin(x * 1.31 + 4.2) * 0.2;
+
         for (const sp of st.spotlight) {
-          // Gentle wandering via sinusoidal nudge
-          const nudge = feature.id === 'mental-health' ? 0.008 : 0.012;
-          sp.vx += Math.cos(t * 0.55 + sp.phase) * nudge;
-          sp.vy += Math.sin(t * 0.50 + sp.phase) * nudge;
+          const base = feature.id === 'mental-health' ? 0.020 : 0.028;
+          const nx = noise(t * 0.9 + sp.seed);
+          const ny = noise(t * 0.9 + sp.seed + 100.0);
+
+          // Wander acceleration
+          sp.vx += nx * base;
+          sp.vy += ny * base;
+
+          // Soft repulsion from center
+          const dxC = sp.x - avoidCx;
+          const dyC = sp.y - avoidCy;
+          const dC = Math.sqrt(dxC * dxC + dyC * dyC);
+          if (dC < avoidR) {
+            const push = (1 - dC / avoidR) * 0.18;
+            sp.vx += (dxC / Math.max(1, dC)) * push;
+            sp.vy += (dyC / Math.max(1, dC)) * push;
+          }
 
           // Damp to prevent runaway speeds
-          sp.vx *= 0.98;
-          sp.vy *= 0.98;
+          sp.vx *= 0.975;
+          sp.vy *= 0.975;
 
           sp.x += sp.vx;
           sp.y += sp.vy;
