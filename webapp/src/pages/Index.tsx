@@ -22,8 +22,6 @@ export default function Index() {
         <FeatureSections />
         <DataLayerSection />
         <CTASection />
-        <Footer />
-        <div style={{ height: 0 }} />
       </div>
 
       <BottomBar />
