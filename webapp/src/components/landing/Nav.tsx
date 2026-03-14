@@ -74,7 +74,7 @@ export function Nav() {
         borderBottom: scrolled ? '1px solid rgba(202, 60, 61, 0.12)' : '1px solid transparent',
       }}
     >
-      <div className="max-w-7xl mx-auto px-5 lg:px-10">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group" aria-label="Sapien Eleven Platforms">
