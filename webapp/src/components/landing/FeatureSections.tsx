@@ -302,9 +302,13 @@ function FeatureCanvasDiagram({ feature, isVisible }: { feature: FeatureDef; isV
       case 'mental-health':
         return [
           { kind: 'text', text: 'MOOD' },
-          { kind: 'text', text: 'BREATHWORK' },
-          { kind: 'text', text: 'MINDSET' },
+          { kind: 'text', text: 'SLEEP' },
+          { kind: 'text', text: 'MINDFULNESS' },
+          { kind: 'text', text: 'RESILIENCE' },
+          { kind: 'text', text: 'MEDITATION' },
+          { kind: 'text', text: 'MENTAL HEALTH' },
           { kind: 'icon', name: 'MHCoach', src: '/spotlight/mhcoach.svg' },
+          // Icons will be appended here as you send them.
         ];
       default:
         return [];
